@@ -1,0 +1,36 @@
+---
+- name: Add apt repo for MaaS
+  ansible.builtin.apt_repository:
+    repo: "ppa:maas/{{ version }}"
+    state: present
+
+- name: Install MaaS from apt
+  ansible.builtin.apt:
+    name: maas
+    state: present
+
+- name: Initialise MaaS if not already initialised
+  ansible.builtin.command:
+    cmd: >
+      maas init
+      --admin-username={{ user }}
+      --admin-password={{ password }}
+      --admin-email={{ email }}
+      --admin-ssh-import={{ ssh_import_target }}
+      --rbac-url=""
+      --candid-agent-file=""
+  no_log: true
+  args:
+    creates: /var/lib/maas/.maas_initialised
+  register: maas_init_result
+
+- name: Touch MaaS init marker file
+  when:
+    - maas_init_result is defined
+    - maas_init_result.rc == 0
+  ansible.builtin.file:
+    path: /var/lib/maas/.maas_initialised
+    state: touch
+    owner: root
+    group: root
+    mode: '0600'

@@ -1,0 +1,9 @@
+---
+postgresql_version: 16
+postgresql_python_library: python3-psycopg2
+
+postgresql_databases:
+  - name: maas_db
+postgresql_users:
+  - name: "{{ vault_maas_postgres_user }}"
+    password: "{{ vault_maas_postgres_pw }}"

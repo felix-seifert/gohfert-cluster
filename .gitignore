@@ -1,0 +1,8 @@
+roles/*
+!roles/custom_*
+
+.ansible
+.venv
+.vscode
+
+vault-pass.txt

@@ -1,0 +1,85 @@
+---
+- name: Run apt basics
+  hosts: maas_hosts
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Ensure cache is updated
+      tags: always
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600 # 1 hour
+
+    - name: Run apt upgrade
+      tags: upgrade
+      when: "'upgrade' in ansible_run_tags"
+      block:
+        - name: Run apt upgrade
+          ansible.builtin.include_role:
+            name: custom_apt_upgrade
+
+
+- name: Set up DB
+  hosts: maas_hosts
+  tags: install
+  become: true
+  vars:
+    run_install: "{{ 'install' in ansible_run_tags }}"
+  tasks:
+    - name: Set up PostgreSQL only if `install` tag is passed
+      when: run_install
+      block:
+        - name: Install PostgreSQL with `geerlingguy.postgresql`
+          ansible.builtin.include_role:
+            name: geerlingguy.postgresql
+          vars:
+            postgresql_service_state: started
+            postgresql_service_enabled: true
+            postgresql_locales:
+              - 'en_US.UTF-8'
+            postgresql_hba_entries:
+              # 4 standard entries + last specific one
+              - {type: local, database: all, user: postgres, auth_method: peer}
+              - {type: local, database: all, user: all, auth_method: peer}
+              - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: "{{ postgresql_auth_method }}"}
+              - {type: host, database: all, user: all, address: '::1/128', auth_method: "{{ postgresql_auth_method }}"}
+              - {type: host, database: "{{ postgresql_databases[0].name }}", user: "{{ postgresql_users[0].name }}", address: '0/0', auth_method: md5}
+
+
+- name: Set up MaaS
+  hosts: maas_hosts
+  tags: install
+  gather_facts: false
+  become: true
+  vars:
+    run_install: "{{ 'install' in ansible_run_tags }}"
+  tasks:
+    - name: Set up MaaS only if `install` tag is passed
+      when: run_install
+      block:
+        - name: Set up MaaS
+          ansible.builtin.include_role:
+            name: custom_maas_setup
+          vars:
+            user: "{{ maas.admin.user }}"
+            password: "{{ maas.admin.password }}"
+            email: "{{ maas.admin.email }}"
+            ssh_import_target: "{{ maas.admin.ssh_import }}"
+            version: "{{ maas.version }}"
+          no_log: true
+
+
+- name: Teardown MaaS
+  hosts: maas_hosts
+  tags: teardown
+  gather_facts: false
+  become: true
+  vars:
+    run_teardown: "{{ 'teardown' in ansible_run_tags }}"
+  tasks:
+    - name: Teardown MaaS only if `teardown` tag is passed
+      when: run_teardown
+      block:
+        - name: Teardown MaaS
+          ansible.builtin.include_role:
+            name: custom_maas_teardown

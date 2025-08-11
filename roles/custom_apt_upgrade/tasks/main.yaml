@@ -1,0 +1,20 @@
+---
+- name: Run upgrade
+  ansible.builtin.apt:
+    upgrade: true
+
+- name: Check if a reboot is required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+    get_checksum: false
+  register: reboot_required_file
+
+- name: Reboot the server (if required)
+  ansible.builtin.reboot:
+  when:
+    - reboot_required_file is defined
+    - reboot_required_file.stat.exists
+
+- name: Remove dependencies that are no longer required
+  ansible.builtin.apt:
+    autoremove: true

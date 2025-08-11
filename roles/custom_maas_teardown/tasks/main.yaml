@@ -1,0 +1,33 @@
+---
+- name: Uninstall MaaS
+  ansible.builtin.apt:
+    name:
+      - maas
+      - maas-agent
+      - maas-cli
+      - maas-common
+      - maas-dhcp
+      - maas-nemon
+      - maas-proxy
+      - maas-rack
+      - python3-maas-client
+      - python3-maas-provisioningserver
+    state: absent
+
+- name: Remove MaaS Files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/var/lib/maas/"
+    - "/etc/maas/"
+
+- name: Uninstall Postgres
+  ansible.builtin.apt:
+    name:
+      - "postgresql-{{ postgresql_version }}"
+      - "postgresql-common"
+      - "postgresql"
+      - "{{ postgresql_python_library }}"
+    state: absent
+    purge: true

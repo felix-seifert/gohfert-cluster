@@ -1,0 +1,8 @@
+---
+maas:
+  admin:
+    user: "{{ vault_maas_admin_user }}"
+    email: "{{ vault_maas_admin_email }}"
+    password: "{{ vault_maas_admin_pw }}"
+    ssh_import: gh:felix-seifert
+  version: 3.6

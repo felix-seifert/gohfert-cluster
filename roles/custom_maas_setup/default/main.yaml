@@ -1,0 +1,6 @@
+---
+user: "user"
+password: "password"
+email: "email_address"
+ssh_import_target: "ssh_key_location"
+version: 3.0
