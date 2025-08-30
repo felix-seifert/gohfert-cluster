@@ -20,3 +20,15 @@ switch's LED.
 
 If a new machine is connected a subnet monitored by MAAS, the machine shows up in the web UI. Via the `Actions` tab, you
 can then go intuitively through the aforementioned provisioning flow.
+
+## Terraform
+
+Terraform adopts and manages the machines in two different resources: `maas_machine` and `maas_instance`.
+
+* `maas_machine` describes the bare metal machine object in MAAS (commissioned but not deployed).
+* `maas_instane` actually requests MAAS to allocate and deploy that machine to turn it into a usable system.
+
+As described previously, new machines show up in the MAAS web UI. This implies that MAAS takes some form of ownership;
+Terraform then complains that the given MAC addresses are already used and cannot be used to create new resources. To
+circumvent this, when you want to provision a new machine shown in the MAAS web UI via Terraform, you can simply delete
+this machine in the web UI and afterwards apply Terraform.
