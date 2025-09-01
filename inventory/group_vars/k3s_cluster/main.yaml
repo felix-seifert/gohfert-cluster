@@ -1,0 +1,9 @@
+---
+ansible_port: 22
+ansible_python_interpreter: /usr/bin/python3.12
+
+# Jinja to be resolved by Ansible
+api_endpoint: "{{ hostvars[groups['server'] | first]['ansible_host'] | default(groups['server'] | first) }}"
+
+# Force Ansible to connect via jump host. Might not work on CI.
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q maas.cluster.gohfert.com"'

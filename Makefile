@@ -6,7 +6,6 @@ ANSIBLE_GALAXY := $(VENV)/bin/ansible-galaxy
 ANSIBLE_LINT := $(VENV)/bin/ansible-lint
 
 PLAYBOOK ?= playbooks/maas_ops.yaml
-INVENTORY ?= inventory/hosts
 TAGS ?= all
 VAULT ?= --vault-password-file vault-pass.txt
 ARGS ?=
@@ -33,7 +32,7 @@ lint: venv
 
 run: venv
 	@echo "Running playbook: $(PLAYBOOK)"
-	@$(ANSIBLE_PLAYBOOK) --inventory $(INVENTORY) $(PLAYBOOK) --tags $(TAGS) $(VAULT) $(ARGS)
+	@$(ANSIBLE_PLAYBOOK) $(PLAYBOOK) --tags $(TAGS) $(VAULT) $(ARGS)
 
 .PHONY: clean
 clean:
