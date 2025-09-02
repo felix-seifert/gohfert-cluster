@@ -29,8 +29,9 @@ resource "maas_instance" "this" {
   }
 
   deploy_params {
-    distro_series = var.distro_series
-    user_data = templatefile("${path.module}/k3s-cloud-init.tpl", {
+    distro_series  = var.distro_series
+    enable_hw_sync = true
+    user_data = templatefile("${path.module}/cloud-init.tpl", {
       admin_user_name      = var.admin_user_name
       admin_public_ssh_key = var.admin_public_ssh_key
     })
