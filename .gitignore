@@ -1,8 +1,13 @@
-roles/*
-!roles/custom_*
+ansible/roles/*
+!ansible/roles/custom_*
 
 .ansible
+.idea
 .venv
 .vscode
 
+.env
 vault-pass.txt
+
+terraform/.terraform
+terraform/terraform.tfstate*
