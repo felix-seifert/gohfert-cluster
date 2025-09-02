@@ -10,10 +10,10 @@ TAGS ?= all
 VAULT ?= --vault-password-file vault-pass.txt
 ARGS ?=
 
-DEPLOY_K3S_CLUSTER_PLAYBOOK := k32.orchestration.site
-RESET_K3S_CLUSTER_PLAYBOOK := k32.orchestration.reset
-REBOOT_K3S_CLUSTER_PLAYBOOK := k32.orchestration.reboot
-UPGRADE_K3S_CLUSTER_PLAYBOOK := k32.orchestration.upgrade
+DEPLOY_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.site
+RESET_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reset
+REBOOT_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reboot
+UPGRADE_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.upgrade
 
 .PHONY: lint run help
 
