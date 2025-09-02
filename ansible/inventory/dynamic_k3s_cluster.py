@@ -7,7 +7,7 @@ import sys
 from typing import Tuple, List, Any, Dict
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CSV_FILE_WITH_MACHINE_DATA = os.path.join(BASE_DIR, "../data/machines.csv")
+CSV_FILE_WITH_MACHINE_DATA = os.path.join(BASE_DIR, "../../data/machines.csv")
 
 
 def load_hosts(csv_path: str) -> Tuple[List[str], List[str], Dict[str, Dict[str, Any]]]:
