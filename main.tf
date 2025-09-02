@@ -1,5 +1,5 @@
 locals {
-  data_dir     = "${path.module}/baremetal-data"
+  data_dir     = "${path.module}/data"
   machine_data = csvdecode(file("${local.data_dir}/machines.csv"))
 }
 
