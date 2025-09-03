@@ -4,6 +4,10 @@ PIP := $(VENV)/bin/pip
 ANSIBLE_PLAYBOOK := $(VENV)/bin/ansible-playbook
 ANSIBLE_GALAXY := $(VENV)/bin/ansible-galaxy
 ANSIBLE_LINT := $(VENV)/bin/ansible-lint
+ANSIBLE_SUBDIR := ansible
+
+TF := terraform
+TF_SUBDIR := terraform
 
 PLAYBOOK ?= ansible/playbooks/maas_ops.yaml
 TAGS ?= all
@@ -15,25 +19,43 @@ RESET_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reset
 REBOOT_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reboot
 UPGRADE_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.upgrade
 
-.PHONY: lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes upgrade-k3s-cluster-nodes
+.PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes upgrade-k3s-cluster-nodes
 
 .DEFAULT_GOAL := help
 
+check-terraform:
+	@command -v $(TF) >/dev/null 2>&1 || { \
+		echo "Terraform is not available on your PATH. Please install it first and put it on your PATH."; \
+		exit 1; \
+	}
+	@echo "Terraform is installed: $$($(TF) version | head -n1)"
+
+init: $(TF_SUBDIR)/.terraform check-terraform
+
+$(TF_SUBDIR)/.terraform: $(TF_SUBDIR)/provider.tf
+	@echo "Initialisaing Terraform subdir"
+	@$(TF) -chdir=$(TF_SUBDIR) init
+	touch $(TF_SUBDIR)/.terraform
+
 venv: $(VENV)
 
-$(VENV): requirements.txt ansible/requirements.yaml
+$(VENV): requirements.txt $(ANSIBLE_SUBDIR)/requirements.yaml
 	@python3 -m venv $(VENV)
 	@$(PIP) install --upgrade pip
 	@$(PIP) install -r requirements.txt
-	@if [ -f ansible/requirements.yaml ]; then \
+	@if [ -f $(ANSIBLE_SUBDIR)/requirements.yaml ]; then \
 		echo "Installing Ansible Galaxy roles/collections..."; \
-		$(ANSIBLE_GALAXY) install -r ansible/requirements.yaml; \
+		$(ANSIBLE_GALAXY) install -r $(ANSIBLE_SUBDIR)/requirements.yaml; \
 	fi
 	touch $(VENV)
 
-lint: venv
+lint: venv init
+	@echo "Running terraform fmt check..."
+	$(TF) fmt -recursive -check -diff ./terraform/
+	@echo "Running terraform validate..."
+	$(TF) -chdir=terraform validate
 	@echo "Running ansible-lint..."
-	@$(ANSIBLE_LINT) ./ansible/
+	@$(ANSIBLE_LINT) $(ANSIBLE_SUBDIR)
 
 run: venv
 	@echo "Running playbook: $(PLAYBOOK)"
