@@ -1,3 +1,4 @@
 hostname,nic_mac_address,ubuntu_distro,admin_user_name,admin_public_ssh_key,is_k3s_master
 dematu01,f4:ee:08:b9:26:c0,noble,felix-seifert,gh:felix-seifert,true
-dematu02,6c:2b:59:3a:69:b9,noble,felix-seifert,gh:felix-seifert,false
+dematu02,6c:2b:59:3a:69:b9,noble,felix-seifert,gh:felix-seifert,true
+dematu03,b4:45:06:09:55:a7,noble,felix-seifert,gh:felix-seifert,true
