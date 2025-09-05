@@ -1,0 +1,69 @@
+@startuml
+skin rose
+skinparam Shadowing false
+'skinparam linetype ortho
+'skinparam linetype polyline
+'skinparam nodesep 50
+skinparam ranksep 80
+
+
+rectangle "Developer VLAN" {
+    agent "Dev Machine" as dev
+}
+
+rectangle "VLAN 150" {
+    rectangle "Raspberry Pi" as pi {
+        component MAAS as maas
+        [<font:monospace> </font>] as invi
+        circle " " as jump
+    }
+
+    node "Dell Wyse 5070" as dell1 {
+        component "K3s Master" as k3s1
+    }
+
+    node "Dell Wyse 5070" as dell2 {
+        component "K3s Master" as k3s2
+    }
+
+    node "Dell Wyse 5070" as dell3 {
+        component "K3s Master" as k3s3
+    }
+
+'    node "Dell Wyse 5070" as dell4 {
+'        component "K3s Worker" as k3s4
+'    }
+
+    component "K3s Cluster" as cluster
+}
+
+dev --> pi: "1. Configure\nvia Ansible"
+dev -[#blue]-> maas: "2. Call via\nTerraform"
+
+maas -[#blue]-> dell1: Deploy\n(via Terraform)
+maas -[#blue]-> dell2: Deploy\n(via Terraform)
+maas -[#blue]-> dell3: Deploy\n(via Terraform)
+'maas -[#red]-> dell4: Deploy\n(via Terraform)
+
+dev -[#green]-> jump: "3. Jump\nwith Ansible"
+jump --[#green]--> k3s1: Deploy\n(via Ansible)
+jump --[#green]--> k3s2: Deploy\n(via Ansible)
+jump --[#green]--> k3s3: Deploy\n(via Ansible)
+'jump --[#green]--> k3s4
+
+k3s1 --> cluster
+k3s2 --> cluster
+k3s3 --> cluster
+'k3s4 --> cluster
+
+hide invi
+hide invi2
+
+<style>
+.invi {
+    BackgroundColor transparent
+    LineColor transparent
+}
+</style>
+
+@enduml
