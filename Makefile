@@ -5,6 +5,7 @@ ANSIBLE_PLAYBOOK := $(VENV)/bin/ansible-playbook
 ANSIBLE_GALAXY := $(VENV)/bin/ansible-galaxy
 ANSIBLE_LINT := $(VENV)/bin/ansible-lint
 ANSIBLE_SUBDIR := ansible
+ANSIBLE_COLLECTIONS_SUBDIR := $(ANSIBLE_SUBDIR)/ansible_collections
 
 TF := terraform
 TF_SUBDIR := terraform
@@ -45,7 +46,7 @@ $(VENV): requirements.txt $(ANSIBLE_SUBDIR)/requirements.yaml
 	@$(PIP) install -r requirements.txt
 	@if [ -f $(ANSIBLE_SUBDIR)/requirements.yaml ]; then \
 		echo "Installing Ansible Galaxy roles/collections..."; \
-		$(ANSIBLE_GALAXY) install -r $(ANSIBLE_SUBDIR)/requirements.yaml; \
+		$(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_SUBDIR)/requirements.yaml --force; \
 	fi
 	touch $(VENV)
 
@@ -73,6 +74,10 @@ reboot-k3s-cluster-nodes: venv
 clean:
 	@rm -rf $(VENV)
 	@echo "Cleaned up virtual environment."
+	@find $(ANSIBLE_SUBDIR)/roles -maxdepth 1 -mindepth 1 -type d ! -name 'custom_*' -exec rm -rf {} +
+	@echo "Cleaned up installed Ansible Galaxy roles."
+	@rm -rf $(ANSIBLE_COLLECTIONS_SUBDIR)
+	@echo "Cleaned up installed Ansible Galaxy collections."
 
 help:
 	@echo "Usage: make [target]"
@@ -89,4 +94,4 @@ help:
 	@echo "                             in data/machines.csv"
 	@echo "  destroy-k3s-cluster        Destroy existing K3s cluster on machines in data/machines.csv"
 	@echo "  reboot-k3s-cluster-nodes   Reboot K3s nodes/machines in data/machines.csv one by one "
-	@echo "  clean                      Remove virtual environment"
+	@echo "  clean                      Remove virtual environment and installed Ansible Galaxy collections/roles"
