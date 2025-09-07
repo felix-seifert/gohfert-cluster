@@ -10,7 +10,7 @@ List of potential improvement ideas:
       not seem to offer this support anymore.
     * Activating wake-on-LAN in the BIOS of a Dell Wyse 5070 does not help. Physically connecting the fresh machine to
       the network does not result in the machine receiving a DHCP IP address.
-* [ ] Unify usage experience of Ansible and Terraform through `Makefile`
+* [x] Unify usage experience of Ansible and Terraform through `Makefile`
 * ~~[ ] Arrange post-install config with connecting to Kubernetes cluster
   via [cloud-init](./explanations/cloud-init.md)~~
   * [ADR#01](./adrs/01-deploy-k3s-through-ansible.md) justifies a different approach.

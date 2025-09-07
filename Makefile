@@ -9,6 +9,7 @@ ANSIBLE_COLLECTIONS_SUBDIR := $(ANSIBLE_SUBDIR)/ansible_collections
 
 TF := terraform
 TF_SUBDIR := terraform
+TF_PLAN := tfplan
 
 PLAYBOOK ?= ansible/playbooks/maas_ops.yaml
 TAGS ?= all
@@ -71,6 +72,31 @@ destroy-k3s-cluster: venv
 reboot-k3s-cluster-nodes: venv
 	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK)
 
+plan: init
+	$(TF) -chdir=$(TF_SUBDIR) plan -out=$(TF_PLAN)
+
+apply: init
+	@if [ ! -f $(TF_SUBDIR)/$(TF_PLAN) ]; then \
+		$(TF) -chdir=$(TF_SUBDIR) apply; \
+	fi
+	$(TF) -chdir=$(TF_SUBDIR) apply $(TF_PLAN)
+
+mark-for-redeployment: init
+	@if [ -z "$(HOSTNAME)" ]; then \
+		echo 'Error: HOSTNAME argument is required. Usage: `make mark-for-redeployment HOSTNAME=dematu01`'; \
+		exit 1; \
+	fi
+	@# Assumes specific Terraform module structure
+	@$(TF) -chdir=$(TF_SUBDIR) taint module.servers\[\"$(HOSTNAME)\"\].maas_instance.this
+
+mark-for-recommissioning: init
+	@if [ -z "$(HOSTNAME)" ]; then \
+		echo 'Error: HOSTNAME argument is required. Usage: `make mark-for-recommissioning HOSTNAME=dematu01`'; \
+		exit 1; \
+	fi
+	@# Assumes specific Terraform module structure
+	@for resource in `$(TF) -chdir=$(TF_SUBDIR) state list | grep module.servers'\[\"$(HOSTNAME)\"\]'`; do $(TF) -chdir=$(TF_SUBDIR) taint $$resource; done
+
 clean:
 	@rm -rf $(VENV)
 	@echo "Cleaned up virtual environment."
@@ -94,4 +120,9 @@ help:
 	@echo "                             in data/machines.csv"
 	@echo "  destroy-k3s-cluster        Destroy existing K3s cluster on machines in data/machines.csv"
 	@echo "  reboot-k3s-cluster-nodes   Reboot K3s nodes/machines in data/machines.csv one by one "
+	@echo "  plan                       Check Terraform state objects' intention and store necessary changes"
+	@echo "                             in a plan file"
+	@echo "  apply                      Perform Terraform changes previously stored in a plan file"
+	@echo "  mark-for-redeployment      Mark host in var HOSTNAME for redeployment through Terraform"
+	@echo "  mark-for-recommissioning"  "Mark host in var HOSTNAME for recommissioning through Terraform"
 	@echo "  clean                      Remove virtual environment and installed Ansible Galaxy collections/roles"
