@@ -11,8 +11,8 @@ CSV_FILE_WITH_MACHINE_DATA = os.path.join(BASE_DIR, "../../data/machines.csv")
 
 
 def load_hosts(csv_path: str) -> Tuple[List[str], List[str], Dict[str, Dict[str, Any]]]:
-    servers = []
-    agents = []
+    masters = []
+    nodes = []
     hostvars = {}
 
     with open(csv_path, newline="") as f:
@@ -22,20 +22,20 @@ def load_hosts(csv_path: str) -> Tuple[List[str], List[str], Dict[str, Dict[str,
             is_master = row["is_k3s_master"].strip().lower() == "true"
 
             if is_master:
-                servers.append(hostname)
+                masters.append(hostname)
             else:
-                agents.append(hostname)
+                nodes.append(hostname)
 
             hostvars[hostname] = {
                 "ansible_host": hostname,  # use hostname as address
                 "ansible_user": row["admin_user_name"],
             }
 
-    return servers, agents, hostvars
+    return masters, nodes, hostvars
 
 
 def build_inventory(csv_path: str) -> Dict[str, Any]:
-    servers, agents, hostvars = load_hosts(csv_path)
+    masters, nodes, hostvars = load_hosts(csv_path)
 
     inv = {
         # make sure 'all' knows about our top-level group
@@ -43,10 +43,10 @@ def build_inventory(csv_path: str) -> Dict[str, Any]:
             "children": ["k3s_cluster"]
         },
         "k3s_cluster": {
-            "children": ["server", "agent"],
+            "children": ["master", "node"],
         },
-        "server": {"hosts": servers},
-        "agent": {"hosts": agents},
+        "master": {"hosts": masters},
+        "node": {"hosts": nodes},
 
         # hostvars for fast mode
         "_meta": {"hostvars": hostvars},

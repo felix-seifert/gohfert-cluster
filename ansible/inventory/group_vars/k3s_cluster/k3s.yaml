@@ -1,7 +1,72 @@
 ---
-# Jinja to be resolved by Ansible
-api_endpoint: "{{ hostvars[groups['server'] | first]['ansible_host'] | default(groups['server'] | first) }}"
-
 k3s_version: "v1.33.4+k3s1"
 
-token: "{{ vault_k3s_token }}"
+k3s_token: "{{ vault_k3s_token }}"
+
+systemd_dir: /etc/systemd/system
+
+# Set your timezone
+system_timezone: "Europe/Amsterdam"
+
+# interface which will be used for flannel
+flannel_iface: "eth0"
+
+cilium_bgp: false
+
+# apiserver_endpoint is virtual ip-address which will be configured on each master
+apiserver_endpoint: "192.168.150.200"
+
+# The IP on which the node is reachable in the cluster.
+# Here, a sensible default is provided, you can still override
+# it for each of your hosts, though.
+k3s_node_ip: "{{ ansible_facts[(cilium_iface | default(calico_iface | default(flannel_iface)))]['ipv4']['address'] }}"
+
+# Disable the taint manually by setting: k3s_master_taint = false
+k3s_master_taint: "{{ true if groups['node'] | default([]) | length >= 1 else false }}"
+
+# these arguments are recommended for servers as well as agents:
+extra_args: >-
+  {{ '--flannel-iface=' + flannel_iface if calico_iface is not defined and cilium_iface is not defined else '' }}
+  --node-ip={{ k3s_node_ip }}
+
+# change these to your liking, the only required are: --disable servicelb, --tls-san {{ apiserver_endpoint }}
+# the contents of the if block is also required if using calico or cilium
+extra_server_args: >-
+  {{ extra_args }}
+  {{ '--node-taint node-role.kubernetes.io/master=true:NoSchedule' if k3s_master_taint else '' }}
+  {% if calico_iface is defined or cilium_iface is defined %}
+  --flannel-backend=none
+  --disable-network-policy
+  --cluster-cidr={{ cluster_cidr | default('10.52.0.0/16') }}
+  {% endif %}
+  --tls-san {{ apiserver_endpoint }}
+  --disable servicelb
+  --disable traefik
+  --write-kubeconfig-mode=644
+
+extra_agent_args: >-
+  {{ extra_args }}
+
+# image tag for kube-vip
+kube_vip_tag_version: "v1.0.0"
+
+# metallb type frr or native
+metal_lb_type: "native"
+
+# metallb mode layer2 or bgp
+metal_lb_mode: "layer2"
+
+# bgp options
+# metal_lb_bgp_my_asn: "64513"
+# metal_lb_bgp_peer_asn: "64512"
+# metal_lb_bgp_peer_address: "192.168.30.1"
+
+# image tag for metal lb
+metal_lb_speaker_tag_version: "v0.15.2"
+metal_lb_controller_tag_version: "v0.15.2"
+
+# metallb ip range for load balancer
+metal_lb_ip_range: "192.168.150.210-192.168.150.229"
+
+proxmox_lxc_configure: false
+custom_registries: false

@@ -14,12 +14,12 @@ TAGS ?= all
 VAULT ?= --vault-password-file vault-pass.txt
 ARGS ?=
 
-DEPLOY_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.site
-RESET_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reset
-REBOOT_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reboot
-UPGRADE_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.upgrade
+K3S_ANSIBLE_COLLECTION := $(ANSIBLE_SUBDIR)/ansible_collections/techno_tim/k3s_ansible
+DEPLOY_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/site.yml
+RESET_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/reset.yml
+REBOOT_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/reboot.yml
 
-.PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes upgrade-k3s-cluster-nodes
+.PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes
 
 .DEFAULT_GOAL := help
 
@@ -61,17 +61,14 @@ run: venv
 	@echo "Running playbook: $(PLAYBOOK)"
 	@$(ANSIBLE_PLAYBOOK) $(PLAYBOOK) --tags $(TAGS) $(VAULT) $(ARGS)
 
-deploy-k3s-cluster:
+deploy-k3s-cluster: venv
 	$(MAKE) run PLAYBOOK=$(DEPLOY_K3S_CLUSTER_PLAYBOOK)
 
-destroy-k3s-cluster:
+destroy-k3s-cluster: venv
 	$(MAKE) run PLAYBOOK=$(RESET_K3S_CLUSTER_PLAYBOOK)
 
-reboot-k3s-cluster-nodes:
+reboot-k3s-cluster-nodes: venv
 	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK)
-
-upgrade-k3s-cluster-nodes:
-	$(MAKE) run PLAYBOOK=$(UPGRADE_K3S_CLUSTER_PLAYBOOK)
 
 clean:
 	@rm -rf $(VENV)
@@ -92,6 +89,4 @@ help:
 	@echo "                             in data/machines.csv"
 	@echo "  destroy-k3s-cluster        Destroy existing K3s cluster on machines in data/machines.csv"
 	@echo "  reboot-k3s-cluster-nodes   Reboot K3s nodes/machines in data/machines.csv one by one "
-	@echo "  upgrade-k3s-cluster-nodes  Upgrade K3s nodes/machines in data/machines.csv one by one to"
-	@echo "                             match K3s version in inventory"
 	@echo "  clean                      Remove virtual environment"
