@@ -5,6 +5,7 @@ ANSIBLE_PLAYBOOK := $(VENV)/bin/ansible-playbook
 ANSIBLE_GALAXY := $(VENV)/bin/ansible-galaxy
 ANSIBLE_LINT := $(VENV)/bin/ansible-lint
 ANSIBLE_SUBDIR := ansible
+ANSIBLE_COLLECTIONS_SUBDIR := $(ANSIBLE_SUBDIR)/ansible_collections
 
 TF := terraform
 TF_SUBDIR := terraform
@@ -14,12 +15,12 @@ TAGS ?= all
 VAULT ?= --vault-password-file vault-pass.txt
 ARGS ?=
 
-DEPLOY_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.site
-RESET_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reset
-REBOOT_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.reboot
-UPGRADE_K3S_CLUSTER_PLAYBOOK := k3s.orchestration.upgrade
+K3S_ANSIBLE_COLLECTION := $(ANSIBLE_SUBDIR)/ansible_collections/techno_tim/k3s_ansible
+DEPLOY_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/site.yml
+RESET_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/reset.yml
+REBOOT_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/reboot.yml
 
-.PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes upgrade-k3s-cluster-nodes
+.PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes
 
 .DEFAULT_GOAL := help
 
@@ -45,7 +46,7 @@ $(VENV): requirements.txt $(ANSIBLE_SUBDIR)/requirements.yaml
 	@$(PIP) install -r requirements.txt
 	@if [ -f $(ANSIBLE_SUBDIR)/requirements.yaml ]; then \
 		echo "Installing Ansible Galaxy roles/collections..."; \
-		$(ANSIBLE_GALAXY) install -r $(ANSIBLE_SUBDIR)/requirements.yaml; \
+		$(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_SUBDIR)/requirements.yaml --force; \
 	fi
 	touch $(VENV)
 
@@ -61,21 +62,22 @@ run: venv
 	@echo "Running playbook: $(PLAYBOOK)"
 	@$(ANSIBLE_PLAYBOOK) $(PLAYBOOK) --tags $(TAGS) $(VAULT) $(ARGS)
 
-deploy-k3s-cluster:
+deploy-k3s-cluster: venv
 	$(MAKE) run PLAYBOOK=$(DEPLOY_K3S_CLUSTER_PLAYBOOK)
 
-destroy-k3s-cluster:
+destroy-k3s-cluster: venv
 	$(MAKE) run PLAYBOOK=$(RESET_K3S_CLUSTER_PLAYBOOK)
 
-reboot-k3s-cluster-nodes:
+reboot-k3s-cluster-nodes: venv
 	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK)
-
-upgrade-k3s-cluster-nodes:
-	$(MAKE) run PLAYBOOK=$(UPGRADE_K3S_CLUSTER_PLAYBOOK)
 
 clean:
 	@rm -rf $(VENV)
 	@echo "Cleaned up virtual environment."
+	@find $(ANSIBLE_SUBDIR)/roles -maxdepth 1 -mindepth 1 -type d ! -name 'custom_*' -exec rm -rf {} +
+	@echo "Cleaned up installed Ansible Galaxy roles."
+	@rm -rf $(ANSIBLE_COLLECTIONS_SUBDIR)
+	@echo "Cleaned up installed Ansible Galaxy collections."
 
 help:
 	@echo "Usage: make [target]"
@@ -92,6 +94,4 @@ help:
 	@echo "                             in data/machines.csv"
 	@echo "  destroy-k3s-cluster        Destroy existing K3s cluster on machines in data/machines.csv"
 	@echo "  reboot-k3s-cluster-nodes   Reboot K3s nodes/machines in data/machines.csv one by one "
-	@echo "  upgrade-k3s-cluster-nodes  Upgrade K3s nodes/machines in data/machines.csv one by one to"
-	@echo "                             match K3s version in inventory"
-	@echo "  clean                      Remove virtual environment"
+	@echo "  clean                      Remove virtual environment and installed Ansible Galaxy collections/roles"

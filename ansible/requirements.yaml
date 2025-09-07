@@ -4,6 +4,16 @@ roles:
     version: "4.0.1"
 
 collections:
-  - name: https://github.com/k3s-io/k3s-ansible.git
+  - name: https://github.com/timothystewart6/k3s-ansible
     type: git
-    version: 5a19438
+    version: 668d7fb896c226cde2960491a60b917db8a4bf7e # 1.30.2
+
+  # Needed for timothystewart6/k3s-ansible
+  - name: ansible.utils
+    version: 6.0.0
+  - name: community.general
+    version: 11.2.1
+  - name: ansible.posix
+    version: 2.1.0
+  - name: kubernetes.core
+    version: 6.1.0
