@@ -46,7 +46,9 @@ $(VENV): requirements.txt $(ANSIBLE_SUBDIR)/requirements.yaml
 	@$(PIP) install --upgrade pip
 	@$(PIP) install -r requirements.txt
 	@if [ -f $(ANSIBLE_SUBDIR)/requirements.yaml ]; then \
-		echo "Installing Ansible Galaxy roles/collections..."; \
+		echo "Installing Ansible Galaxy roles..."; \
+		$(ANSIBLE_GALAXY) role install -r $(ANSIBLE_SUBDIR)/requirements.yaml --force; \
+		echo "Installing Ansible Galaxy collections..."; \
 		$(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_SUBDIR)/requirements.yaml --force; \
 	fi
 	touch $(VENV)
