@@ -1,9 +1,16 @@
 ---
 roles:
+  # For setting up PostgreSQL database
   - name: geerlingguy.postgresql
     version: "4.0.1"
 
+  # For installing self-hosted GitHub Actions runner
+  - name: monolithprojects.github_actions_runner
+    version: ed4b47a28940824d5b25822df41c638e5eba96a5 # 1.26.0
+    src: https://github.com/MonolithProjects/ansible-github_actions_runner
+
 collections:
+  # For deploying K3s cluster
   - name: https://github.com/timothystewart6/k3s-ansible
     type: git
     version: 668d7fb896c226cde2960491a60b917db8a4bf7e # 1.30.2

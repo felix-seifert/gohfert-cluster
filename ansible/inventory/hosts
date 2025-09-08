@@ -1,2 +1,5 @@
 [maas_hosts]
 maas_host_1 ansible_host=maas.cluster.gohfert.com ansible_user=felix-seifert
+
+[gha_runners]
+gha_runner_1 ansible_host=maas.cluster.gohfert.com ansible_user=felix-seifert
