@@ -1,0 +1,24 @@
+---
+- name: Ensure presence of runner user
+  hosts: gha_runners
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Ensure presence of runner user
+      ansible.builtin.user:
+        name: "{{ gha_runner_user }}"
+        state: present
+        create_home: false
+        shell: /bin/bash
+
+- name: Install GitHub Actions runner
+  hosts: gha_runners
+  become: true
+  vars:
+    access_token: "{{ github_pat }}"
+    github_account: "{{ account }}"
+    github_repo: "{{ repo }}"
+    runner_user: "{{ gha_runner_user }}"
+    runner_version: "{{ gha_runner_version }}"
+  roles:
+    - role: monolithprojects.github_actions_runner

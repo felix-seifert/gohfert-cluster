@@ -1,0 +1,6 @@
+---
+ansible_env:
+  LANG: C
+  LC_ALL: C
+
+ansible_python_interpreter: /usr/bin/python3.12
