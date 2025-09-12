@@ -11,7 +11,7 @@ TF := terraform
 TF_SUBDIR := terraform
 TF_PLAN := tfplan
 
-PLAYBOOK ?= ansible/playbooks/maas_ops.yaml
+PLAYBOOK ?= $(ANSIBLE_SUBDIR)/playbooks/maas_ops.yaml
 TAGS ?= all
 VAULT ?= --vault-password-file vault-pass.txt
 ARGS ?=
@@ -19,7 +19,7 @@ ARGS ?=
 K3S_ANSIBLE_COLLECTION := $(ANSIBLE_SUBDIR)/ansible_collections/techno_tim/k3s_ansible
 DEPLOY_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/site.yml
 RESET_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/reset.yml
-REBOOT_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/reboot.yml
+REBOOT_K3S_CLUSTER_PLAYBOOK := $(ANSIBLE_SUBDIR)/playbooks/k3s_node_reboot.yaml
 
 .PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes
 
@@ -72,7 +72,7 @@ destroy-k3s-cluster: venv
 	$(MAKE) run PLAYBOOK=$(RESET_K3S_CLUSTER_PLAYBOOK)
 
 reboot-k3s-cluster-nodes: venv
-	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK)
+	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK) ARGS="--extra-vars 'concurrent_reboots=1 wait_seconds_after_reboot=30'"
 
 plan: init
 	$(TF) -chdir=$(TF_SUBDIR) plan -out=$(TF_PLAN)
