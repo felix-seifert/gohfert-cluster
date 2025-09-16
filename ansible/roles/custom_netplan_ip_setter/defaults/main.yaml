@@ -1,0 +1,6 @@
+netplan_interface: eth0
+netplan_address: "192.168.172.11/24"
+netplan_gateway: "192.168.172.1"
+netplan_nameservers:
+  - "192.168.172.1"
+  - "8.8.8.8"

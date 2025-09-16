@@ -1,0 +1,10 @@
+network:
+  version: 2
+  ethernets:
+    {{ netplan_interface }}:
+      dhcp4: no
+      addresses:
+        - {{ netplan_address }}
+      gateway4: {{ netplan_gateway }}
+      nameservers:
+        addresses: [{{ netplan_nameservers | join(', ') }}]

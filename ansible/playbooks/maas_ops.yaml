@@ -19,6 +19,26 @@
             name: custom_apt_upgrade
 
 
+- name: Ensure static IP address
+  hosts: maas_hosts
+  tags: [install, upgrade]
+  become: true
+  vars:
+    run: "{{ ('install' in ansible_run_tags) or ('upgrade' in ansible_run_tags) }}"
+  tasks:
+    - name: Ensure static IP address only if `install` or `upgrade` tag is passed
+      when: run
+      block:
+        - name: Call role `custom_netplan_ip_setter` with {{ networking.ip_address }}
+          ansible.builtin.include_role:
+            name: custom_netplan_ip_setter
+          vars:
+            netplan_interface: "{{ networking.nic }}"
+            netplan_address: "{{ networking.ip_address }}"
+            netplan_gateway: "{{ networking.gateway }}"
+            netplan_nameservers: "{{ networking.dns_servers }}"
+
+
 - name: Set up DB
   hosts: maas_hosts
   tags: install
