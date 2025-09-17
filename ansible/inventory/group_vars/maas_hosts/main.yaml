@@ -9,5 +9,8 @@ networking:
   nic: eth0
   ip_address: 192.168.150.2/24
   gateway: 192.168.150.1
+  search_domains:
+    - maas
   dns_servers:
+    - 127.0.0.1
     - 192.168.150.1
