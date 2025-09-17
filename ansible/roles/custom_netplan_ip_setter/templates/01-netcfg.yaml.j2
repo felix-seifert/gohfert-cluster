@@ -7,4 +7,5 @@ network:
         - {{ netplan_address }}
       gateway4: {{ netplan_gateway }}
       nameservers:
+        search: [{{ netplan_search_domains | join(', ') }}]
         addresses: [{{ netplan_nameservers | join(', ') }}]

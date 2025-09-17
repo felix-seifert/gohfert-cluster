@@ -36,6 +36,7 @@
             netplan_interface: "{{ networking.nic }}"
             netplan_address: "{{ networking.ip_address }}"
             netplan_gateway: "{{ networking.gateway }}"
+            netplan_search_domains: "{{ networking.search_domains }}"
             netplan_nameservers: "{{ networking.dns_servers }}"
 
 
