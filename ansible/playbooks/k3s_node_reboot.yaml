@@ -2,7 +2,6 @@
 - name: Reboot masters and nodes with optional concurrency
   hosts: k3s_cluster
   gather_facts: false
-  become: true
 
   # concurrent_reboots defines how many hosts to reboot concurrently, if not defined, all hosts rebooted at once
   serial: "{{ concurrent_reboots | default('100%') }}"
