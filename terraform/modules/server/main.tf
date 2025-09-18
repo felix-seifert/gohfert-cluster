@@ -34,6 +34,7 @@ resource "maas_instance" "this" {
     user_data = templatefile("${path.module}/cloud-init.tpl", {
       admin_user_name      = var.admin_user_name
       admin_public_ssh_key = var.admin_public_ssh_key
+      service_accounts     = var.service_accounts
     })
   }
 

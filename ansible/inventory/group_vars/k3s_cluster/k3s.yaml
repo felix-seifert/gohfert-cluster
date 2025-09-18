@@ -68,5 +68,7 @@ metal_lb_controller_tag_version: "v0.15.2"
 # metallb ip range for load balancer
 metal_lb_ip_range: "192.168.150.210-192.168.150.229"
 
+custom_reboot_command: "sudo /sbin/reboot"
+
 proxmox_lxc_configure: false
 custom_registries: false
