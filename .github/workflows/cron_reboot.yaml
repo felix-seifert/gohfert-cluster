@@ -1,0 +1,24 @@
+name: CRON Reboot
+
+on:
+  schedule:
+    # Daily at 3 AM UTC
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  reboot:
+    runs-on: maas-runner # Self-hosted runner has to be provisioned (see gha_runners.yaml Ansible playbook)
+
+    steps:
+      - name: Set up SSH key for svc-gha-ansible-reboot
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SVC_GHA_ANSIBLE_REBOOT_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Test SSH connection to one node
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_ed25519 \
+              svc-gha-ansible-reboot@dematu01.maas "echo OK"
