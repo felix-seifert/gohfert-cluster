@@ -11,14 +11,23 @@ jobs:
     runs-on: maas-runner # Self-hosted runner has to be provisioned (see gha_runners.yaml Ansible playbook)
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # SHA for version 5.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # SHA for version 5.6.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
       - name: Set up SSH key for svc-gha-ansible-reboot
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SVC_GHA_ANSIBLE_REBOOT_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-      - name: Test SSH connection to one node
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-              -i ~/.ssh/id_ed25519 \
-              svc-gha-ansible-reboot@dematu01.maas "echo OK"
+      - name: Set up venv with dependencies
+        run: make venv
+
+      - name: Run staggered reboot
+        run: make reboot-k3s-cluster-nodes USER="svc-gha-ansible-reboot"
