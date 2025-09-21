@@ -4,5 +4,6 @@ repo: gohfert-cluster
 
 github_pat: "{{ vault_github_pat }}"
 gha_runner_user: gha-runner
+gha_runner_name: maas-runner
 
 gha_runner_version: "2.328.0"

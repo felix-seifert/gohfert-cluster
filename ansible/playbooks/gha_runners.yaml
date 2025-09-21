@@ -1,24 +1,41 @@
 ---
-- name: Ensure presence of runner user
+- name: Manage GitHub Actions runner
   hosts: gha_runners
-  gather_facts: false
   become: true
-  tasks:
-    - name: Ensure presence of runner user
+
+  pre_tasks:
+    - name: Fail if both deploy and remove are tagged
+      ansible.builtin.fail:
+        msg: "You cannot use both 'deploy' and 'remove' tags at the same time."
+      when: "'deploy' in ansible_run_tags and 'remove' in ansible_run_tags"
+
+    - name: Set default runner_state (deploy mode)
+      ansible.builtin.set_fact:
+        gha_runner_state: started
+      when: "'remove' not in ansible_run_tags"
+
+    - name: Set runner_state to absent if remove is tagged
+      ansible.builtin.set_fact:
+        gha_runner_state: absent
+      when: "'remove' in ansible_run_tags"
+
+    - name: Ensure runner user state
       ansible.builtin.user:
         name: "{{ gha_runner_user }}"
-        state: present
-        create_home: false
+        state: "{{ 'present' if runner_state == 'started' else 'absent' }}"
+        create_home: true
         shell: /bin/bash
+      tags: always
 
-- name: Install GitHub Actions runner
-  hosts: gha_runners
-  become: true
-  vars:
-    access_token: "{{ github_pat }}"
-    github_account: "{{ account }}"
-    github_repo: "{{ repo }}"
-    runner_user: "{{ gha_runner_user }}"
-    runner_version: "{{ gha_runner_version }}"
   roles:
     - role: monolithprojects.github_actions_runner
+      vars:
+        access_token: "{{ github_pat }}"
+        github_account: "{{ account }}"
+        github_repo: "{{ repo }}"
+        runner_user: "{{ gha_runner_user }}"
+        runner_name: "{{ gha_runner_name }}"
+        runner_version: "{{ gha_runner_version }}"
+        runner_state: "{{ gha_runner_state }}"
+        runner_labels:
+          - "{{ gha_runner_name }}"

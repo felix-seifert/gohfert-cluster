@@ -72,7 +72,13 @@ destroy-k3s-cluster: venv
 	$(MAKE) run PLAYBOOK=$(RESET_K3S_CLUSTER_PLAYBOOK)
 
 reboot-k3s-cluster-nodes: venv
-	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK) ARGS="--extra-vars 'concurrent_reboots=1 wait_seconds_after_reboot=30'"
+ifeq ($(strip $(USER)),)
+	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK) \
+		ARGS="--extra-vars 'concurrent_reboots=1 wait_seconds_after_reboot=30'"
+else
+	$(MAKE) run PLAYBOOK=$(REBOOT_K3S_CLUSTER_PLAYBOOK) \
+		ARGS="--extra-vars 'concurrent_reboots=1 wait_seconds_after_reboot=30 ansible_user=$(USER)'"
+endif
 
 plan: init
 	$(TF) -chdir=$(TF_SUBDIR) plan -out=$(TF_PLAN)
@@ -121,7 +127,8 @@ help:
 	@echo "  deploy-k3s-cluster         Deploy fresh K3s cluster on provisioned machines based on data"
 	@echo "                             in data/machines.csv"
 	@echo "  destroy-k3s-cluster        Destroy existing K3s cluster on machines in data/machines.csv"
-	@echo "  reboot-k3s-cluster-nodes   Reboot K3s nodes/machines in data/machines.csv one by one "
+	@echo "  reboot-k3s-cluster-nodes   Reboot K3s nodes/machines in data/machines.csv one by one with waits"
+	@echo "                             Optionally pass a USER arg to execute as a different user"
 	@echo "  plan                       Check Terraform state objects' intention and store necessary changes"
 	@echo "                             in a plan file"
 	@echo "  apply                      Perform Terraform changes previously stored in a plan file"
