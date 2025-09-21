@@ -7,25 +7,37 @@
     - name: Fail if both deploy and remove are tagged
       ansible.builtin.fail:
         msg: "You cannot use both 'deploy' and 'remove' tags at the same time."
+      tags: [deploy, remove]
       when: "'deploy' in ansible_run_tags and 'remove' in ansible_run_tags"
 
-    - name: Set default runner_state (deploy mode)
+    - name: Set default gha_runner_state (deploy mode)
       ansible.builtin.set_fact:
         gha_runner_state: started
+      tags: always
       when: "'remove' not in ansible_run_tags"
 
-    - name: Set runner_state to absent if remove is tagged
+    - name: Set gha_runner_state to absent if remove is tagged
       ansible.builtin.set_fact:
         gha_runner_state: absent
-      when: "'remove' in ansible_run_tags"
+      tags: [remove]
 
-    - name: Ensure runner user state
+    - name: Ensure runner user presence
       ansible.builtin.user:
         name: "{{ gha_runner_user }}"
-        state: "{{ 'present' if runner_state == 'started' else 'absent' }}"
+        state: present
         create_home: true
         shell: /bin/bash
       tags: always
+      when: gha_runner_state == 'started'
+
+  tasks:
+    - name: Ensure 'make' package is installed (cross-distro)
+      ansible.builtin.package:
+        name: make
+        state: present
+      become: true
+      tags: always
+      when: gha_runner_state == 'started'
 
   roles:
     - role: monolithprojects.github_actions_runner
@@ -39,3 +51,20 @@
         runner_state: "{{ gha_runner_state }}"
         runner_labels:
           - "{{ gha_runner_name }}"
+      tags: always
+
+  post_tasks:
+    - name: Kill processes if of runner user when stopping runner
+      ansible.builtin.shell: "pkill -u {{ gha_runner_user }} || true"
+      become: true
+      register: pkill_result
+      changed_when: pkill_result.rc == 0
+      failed_when: false   # ignore failures when no process exists
+      tags: [remove]
+
+    - name: Ensure runner user absence
+      ansible.builtin.user:
+        name: "{{ gha_runner_user }}"
+        state: absent
+        remove: true
+      tags: [remove]
