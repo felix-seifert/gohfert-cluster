@@ -14,3 +14,6 @@ vault-pass.txt
 
 terraform/.terraform
 terraform/terraform.tfstate*
+
+# Private Git repo for self-hosted runners. This seperate repo can be cloned within this repo but pushed seperately.
+gohfert-cluster-private-runners

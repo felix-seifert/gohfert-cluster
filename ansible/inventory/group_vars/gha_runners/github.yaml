@@ -1,6 +1,7 @@
 ---
 account: felix-seifert
-repo: gohfert-cluster
+# For security purposes, self-hosted runners are in this private repo and triggered via `repository_dispatch` events.
+repo: gohfert-cluster-private-runners
 
 github_pat: "{{ vault_github_pat }}"
 gha_runner_user: gha-runner

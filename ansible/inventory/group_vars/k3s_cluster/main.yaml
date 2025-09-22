@@ -2,5 +2,6 @@
 ansible_port: 22
 ansible_python_interpreter: /usr/bin/python3.12
 
-# Force Ansible to connect via jump host. Might not work on CI.
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q maas.cluster.gohfert.com"'
+# Depending on the environment, Ansible should be forced to connect via jump host.
+# Can be achieved via e.g. `export ANSIBLE_SSH_MAAS_ARGS='-o ProxyCommand="ssh -W %h:%p -q maas.cluster.gohfert.com"'`
+ansible_ssh_common_args: "{{ lookup('env', 'ANSIBLE_SSH_MAAS_ARGS') | default('') }}"
