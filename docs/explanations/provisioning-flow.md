@@ -4,7 +4,7 @@
 2. Allocating the server assigns it to the user so that other MAAS users do not maddle with the machine.
 3. Deploying the server is the process of actually installing an OS on the server's disks.
 
-A machine assumes [different states](https://canonical.com/maas/docs/about-the-machine-life-cycle) according the the
+A machine assumes [different states](https://canonical.com/maas/docs/about-the-machine-life-cycle) according to the
 performed steps. The flow description assumes clicking through the web GUI of the MAAS instance.
 
 ```mermaid

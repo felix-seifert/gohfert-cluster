@@ -1,0 +1,21 @@
+name: CRON Reboot Dispatch
+
+on:
+  schedule:
+    # Daily at 3 AM UTC
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  reboot-dispatch:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Trigger staggered reboot of K3s nodes via private repo
+        uses: peter-evans/repository-dispatch@de78ac1a711fc6f29e77338f843065faf5335227 # Commit from 19 Sep 2025
+        with:
+          token: ${{ secrets.PAT_FOR_TRIGGERING_PRIVATE_WORKFLOWS }}
+          repository: felix-seifert/gohfert-cluster-private-runners
+          event-type: k3s-nodes-staggered-reboot
+          client-payload: '{"ref": "${{ github.ref }}"}'
