@@ -15,10 +15,30 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # SHA for version 5.0.0
 
       - name: Set up Python
+        id: set_up_python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # SHA for version 5.6.0
         with:
           python-version: "3.12"
-          cache: pip
+
+      - name: Get environment info
+        id: env_info
+        run: |
+          dir=$(make print-venv-dir)
+          python_reqs_file=$(make print-python-requirements-file)
+          ansible_reqs_file=$(make print-ansible-requirements-file)
+
+          echo "dir=$dir" >> $GITHUB_OUTPUT
+          echo "python_reqs_file=$python_reqs_file" >> $GITHUB_OUTPUT
+          echo "ansible_reqs_file=$ansible_reqs_file" >> $GITHUB_OUTPUT
+
+          # GitHub’s hashFiles isn’t available here, so use sha256sum
+          echo "hash=$(sha256sum $python_reqs_file | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Restore cached venv
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # SHA for version 4.2.4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.set_up_python.outputs.python-version }}-${{ steps.env_info.outputs.hash }}
+          path: ${{ steps.env_info.outputs.dir }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # SHA for version 3.1.2
@@ -30,7 +50,15 @@ jobs:
         run: make init
 
       - name: Set up venv with dependencies
-        run: make venv
+        run: |
+          touch ${{ steps.env_info.outputs.ansible_reqs_file }}
+          make venv
+
+      - name: Cache venv
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # SHA for version 4.2.4
+        with:
+          key: venv-${{ runner.os }}-${{ steps.set_up_python.outputs.python-version }}-${{ steps.env_info.outputs.hash }}
+          path: ${{ steps.env_info.outputs.dir }}
 
       - name: Run linting
         run: make lint
