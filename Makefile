@@ -7,6 +7,9 @@ ANSIBLE_LINT := $(VENV)/bin/ansible-lint
 ANSIBLE_SUBDIR := ansible
 ANSIBLE_COLLECTIONS_SUBDIR := $(ANSIBLE_SUBDIR)/ansible_collections
 
+PYTHON_REQS_FILE := requirements.txt
+ANSIBLE_REQS_FILE := $(ANSIBLE_SUBDIR)/requirements.yaml
+
 TF := terraform
 TF_SUBDIR := terraform
 TF_PLAN := tfplan
@@ -41,15 +44,15 @@ $(TF_SUBDIR)/.terraform: $(TF_SUBDIR)/provider.tf
 
 venv: $(VENV)
 
-$(VENV): requirements.txt $(ANSIBLE_SUBDIR)/requirements.yaml
+$(VENV): $(PYTHON_REQS_FILE) $(ANSIBLE_REQS_FILE)
 	@python3 -m venv $(VENV)
 	@$(PIP) install --upgrade pip
-	@$(PIP) install -r requirements.txt
-	@if [ -f $(ANSIBLE_SUBDIR)/requirements.yaml ]; then \
+	@$(PIP) install -r $(PYTHON_REQS_FILE)
+	@if [ -f $(ANSIBLE_REQS_FILE) ]; then \
 		echo "Installing Ansible Galaxy roles..."; \
-		$(ANSIBLE_GALAXY) role install -r $(ANSIBLE_SUBDIR)/requirements.yaml --force; \
+		$(ANSIBLE_GALAXY) role install -r $(ANSIBLE_REQS_FILE) --force; \
 		echo "Installing Ansible Galaxy collections..."; \
-		$(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_SUBDIR)/requirements.yaml --force; \
+		$(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_REQS_FILE) --force; \
 	fi
 	touch $(VENV)
 
@@ -135,3 +138,14 @@ help:
 	@echo "  mark-for-redeployment      Mark host in var HOSTNAME for redeployment through Terraform"
 	@echo "  mark-for-recommissioning"  "Mark host in var HOSTNAME for recommissioning through Terraform"
 	@echo "  clean                      Remove virtual environment and installed Ansible Galaxy collections/roles"
+
+.PHONY: print-venv-dir print-python-requirements-file print-ansible-requirements-file
+
+print-venv-dir:
+	@echo $(VENV)
+
+print-python-requirements-file:
+	@echo $(PYTHON_REQS_FILE)
+
+print-ansible-requirements-file:
+	@echo $(ANSIBLE_REQS_FILE)
