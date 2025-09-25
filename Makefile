@@ -10,6 +10,11 @@ ANSIBLE_COLLECTIONS_SUBDIR := $(ANSIBLE_SUBDIR)/ansible_collections
 PYTHON_REQS_FILE := requirements.txt
 ANSIBLE_REQS_FILE := $(ANSIBLE_SUBDIR)/requirements.yaml
 
+# Inline Git config to silence "detached HEAD" advice
+GIT_SILENCE_DETACHED = GIT_CONFIG_COUNT=1 \
+                       GIT_CONFIG_KEY_0=advice.detachedHead \
+                       GIT_CONFIG_VALUE_0=false
+
 TF := terraform
 TF_SUBDIR := terraform
 TF_PLAN := tfplan
@@ -50,9 +55,9 @@ $(VENV): $(PYTHON_REQS_FILE) $(ANSIBLE_REQS_FILE)
 	@$(PIP) install -r $(PYTHON_REQS_FILE)
 	@if [ -f $(ANSIBLE_REQS_FILE) ]; then \
 		echo "Installing Ansible Galaxy roles..."; \
-		$(ANSIBLE_GALAXY) role install -r $(ANSIBLE_REQS_FILE) --force; \
+		$(GIT_SILENCE_DETACHED) $(ANSIBLE_GALAXY) role install -r $(ANSIBLE_REQS_FILE); \
 		echo "Installing Ansible Galaxy collections..."; \
-		$(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_REQS_FILE) --force; \
+		$(GIT_SILENCE_DETACHED) $(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_REQS_FILE); \
 	fi
 	touch $(VENV)
 
@@ -143,6 +148,9 @@ help:
 
 print-venv-dir:
 	@echo $(VENV)
+
+print-ansible-collections-dir:
+	@echo $(ANSIBLE_COLLECTIONS_SUBDIR)
 
 print-python-requirements-file:
 	@echo $(PYTHON_REQS_FILE)
