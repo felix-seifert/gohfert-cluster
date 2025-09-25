@@ -23,22 +23,31 @@ jobs:
       - name: Get environment info
         id: env_info
         run: |
-          dir=$(make print-venv-dir)
+          venv_dir=$(make print-venv-dir)
+          collections_dir=$(make print-ansible-collections-dir)
           python_reqs_file=$(make print-python-requirements-file)
           ansible_reqs_file=$(make print-ansible-requirements-file)
 
-          echo "dir=$dir" >> $GITHUB_OUTPUT
+          echo "venv_dir=$venv_dir" >> $GITHUB_OUTPUT
+          echo "collections_dir=$collections_dir" >> $GITHUB_OUTPUT
           echo "python_reqs_file=$python_reqs_file" >> $GITHUB_OUTPUT
           echo "ansible_reqs_file=$ansible_reqs_file" >> $GITHUB_OUTPUT
 
           # GitHub’s hashFiles isn’t available here, so use sha256sum
-          echo "hash=$(sha256sum $python_reqs_file | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+          echo "python_hash=$(sha256sum $python_reqs_file | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+          echo "ansible_hash=$(sha256sum $ansible_reqs_file | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
 
       - name: Restore cached venv
         uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # SHA for version 4.2.4
         with:
-          key: venv-${{ runner.os }}-${{ steps.set_up_python.outputs.python-version }}-${{ steps.env_info.outputs.hash }}
-          path: ${{ steps.env_info.outputs.dir }}
+          key: venv-${{ runner.os }}-${{ steps.set_up_python.outputs.python-version }}-${{ steps.env_info.outputs.python_hash }}
+          path: ${{ steps.env_info.outputs.venv_dir }}
+
+      - name: Restore cached Ansible collections
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # SHA for version 4.2.4
+        with:
+          key: collections-${{ runner.os }}-${{ steps.env_info.outputs.ansible_hash }}
+          path: ${{ steps.env_info.outputs.collections_dir }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # SHA for version 3.1.2
@@ -57,8 +66,14 @@ jobs:
       - name: Cache venv
         uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # SHA for version 4.2.4
         with:
-          key: venv-${{ runner.os }}-${{ steps.set_up_python.outputs.python-version }}-${{ steps.env_info.outputs.hash }}
-          path: ${{ steps.env_info.outputs.dir }}
+          key: venv-${{ runner.os }}-${{ steps.set_up_python.outputs.python-version }}-${{ steps.env_info.outputs.python_hash }}
+          path: ${{ steps.env_info.outputs.venv_dir }}
+
+      - name: Cache Ansible collections
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # SHA for version 4.2.4
+        with:
+          key: collections-${{ runner.os }}-${{ steps.env_info.outputs.ansible_hash }}
+          path: ${{ steps.env_info.outputs.collections_dir }}
 
       - name: Run linting
         run: make lint
