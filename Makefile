@@ -1,4 +1,5 @@
 VENV ?= .venv
+VENV_STAMP := $(VENV)/.stamp
 PYTHON := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 ANSIBLE_PLAYBOOK := $(VENV)/bin/ansible-playbook
@@ -47,9 +48,9 @@ $(TF_SUBDIR)/.terraform: $(TF_SUBDIR)/provider.tf
 	@$(TF) -chdir=$(TF_SUBDIR) init
 	touch $(TF_SUBDIR)/.terraform
 
-venv: $(VENV)
+venv: $(VENV_STAMP)
 
-$(VENV): $(PYTHON_REQS_FILE) $(ANSIBLE_REQS_FILE)
+$(VENV_STAMP): $(PYTHON_REQS_FILE) $(ANSIBLE_REQS_FILE)
 	@python3 -m venv $(VENV)
 	@$(PIP) install --upgrade pip
 	@$(PIP) install -r $(PYTHON_REQS_FILE)
@@ -59,7 +60,7 @@ $(VENV): $(PYTHON_REQS_FILE) $(ANSIBLE_REQS_FILE)
 		echo "Installing Ansible Galaxy collections..."; \
 		$(GIT_SILENCE_DETACHED) $(ANSIBLE_GALAXY) collection install -r $(ANSIBLE_REQS_FILE); \
 	fi
-	touch $(VENV)
+	touch $@
 
 lint: venv init
 	@echo "Running terraform fmt check..."
