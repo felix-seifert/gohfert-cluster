@@ -16,11 +16,13 @@ runs:
       run: |
         venv_dir=$(make print-venv-dir)
         collections_dir=$(make print-ansible-collections-dir)
+        galaxy_roles_dir=$(make print-ansible-galaxy-roles-dir)
         python_reqs_file=$(make print-python-requirements-file)
         ansible_reqs_file=$(make print-ansible-requirements-file)
 
         echo "venv_dir=$venv_dir" >> $GITHUB_OUTPUT
         echo "collections_dir=$collections_dir" >> $GITHUB_OUTPUT
+        echo "galaxy_roles_dir=galaxy_roles_dir" >> $GITHUB_OUTPUT
         echo "python_reqs_file=$python_reqs_file" >> $GITHUB_OUTPUT
         echo "ansible_reqs_file=$ansible_reqs_file" >> $GITHUB_OUTPUT
 
@@ -40,6 +42,12 @@ runs:
       with:
         key: collections-${{ runner.os }}-${{ steps.env_info.outputs.ansible_hash }}
         path: ${{ steps.env_info.outputs.collections_dir }}
+
+    - name: Cache Ansible Galaxy roles
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # SHA for version 4.2.4
+      with:
+        key: roles-${{ runner.os }}-${{ steps.env_info.outputs.ansible_hash }}
+        path: ${{ steps.env_info.outputs.galaxy_roles_dir }}
 
     - name: Install dependencies according to requirements files
       run: |

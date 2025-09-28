@@ -154,6 +154,9 @@ print-venv-dir:
 print-ansible-collections-dir:
 	@echo $(ANSIBLE_COLLECTIONS_SUBDIR)
 
+print-ansible-galaxy-roles-dir:
+	@echo $(ANSIBLE_GALAXY_ROLES_SUBDIR)
+
 print-python-requirements-file:
 	@echo $(PYTHON_REQS_FILE)
 
