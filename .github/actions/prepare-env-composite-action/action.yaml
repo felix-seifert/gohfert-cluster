@@ -22,7 +22,7 @@ runs:
 
         echo "venv_dir=$venv_dir" >> $GITHUB_OUTPUT
         echo "collections_dir=$collections_dir" >> $GITHUB_OUTPUT
-        echo "galaxy_roles_dir=galaxy_roles_dir" >> $GITHUB_OUTPUT
+        echo "galaxy_roles_dir=$galaxy_roles_dir" >> $GITHUB_OUTPUT
         echo "python_reqs_file=$python_reqs_file" >> $GITHUB_OUTPUT
         echo "ansible_reqs_file=$ansible_reqs_file" >> $GITHUB_OUTPUT
 
