@@ -16,7 +16,7 @@
       block:
         - name: Run apt upgrade
           ansible.builtin.include_role:
-            name: custom_apt_upgrade
+            name: apt_upgrade
 
 
 - name: Ensure static IP address
@@ -29,9 +29,9 @@
     - name: Ensure static IP address only if `install` or `upgrade` tag is passed
       when: run
       block:
-        - name: Call role `custom_netplan_ip_setter` with {{ networking.ip_address }}
+        - name: Call role `netplan_ip_setter` with {{ networking.ip_address }}
           ansible.builtin.include_role:
-            name: custom_netplan_ip_setter
+            name: netplan_ip_setter
           vars:
             netplan_interface: "{{ networking.nic }}"
             netplan_address: "{{ networking.ip_address }}"
@@ -80,7 +80,7 @@
       block:
         - name: Set up MaaS
           ansible.builtin.include_role:
-            name: custom_maas_setup
+            name: maas_setup
           vars:
             user: "{{ maas.admin.user }}"
             password: "{{ maas.admin.password }}"
@@ -103,4 +103,4 @@
       block:
         - name: Teardown MaaS
           ansible.builtin.include_role:
-            name: custom_maas_teardown
+            name: maas_teardown
