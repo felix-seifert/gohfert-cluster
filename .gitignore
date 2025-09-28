@@ -1,13 +1,11 @@
-ansible/roles/*
-!ansible/roles/custom_*
-
-# Purely external collections which are installed dynamically with ansible/requirements.yaml
-ansible/ansible_collections
-
 .ansible
 .idea
 .venv
 .vscode
+
+# Purely external collections/roles which are installed dynamically with ansible/requirements.yaml
+ansible/ansible_collections
+ansible/roles_galaxy
 
 .env
 vault-pass.txt

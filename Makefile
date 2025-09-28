@@ -7,6 +7,7 @@ ANSIBLE_GALAXY := $(VENV)/bin/ansible-galaxy
 ANSIBLE_LINT := $(VENV)/bin/ansible-lint
 ANSIBLE_SUBDIR := ansible
 ANSIBLE_COLLECTIONS_SUBDIR := $(ANSIBLE_SUBDIR)/ansible_collections
+ANSIBLE_GALAXY_ROLES_SUBDIR := $(ANSIBLE_SUBDIR)/roles_galaxy
 
 PYTHON_REQS_FILE := requirements.txt
 ANSIBLE_REQS_FILE := $(ANSIBLE_SUBDIR)/requirements.yaml
@@ -117,7 +118,7 @@ mark-for-recommissioning: init
 clean:
 	@rm -rf $(VENV)
 	@echo "Cleaned up virtual environment."
-	@find $(ANSIBLE_SUBDIR)/roles -maxdepth 1 -mindepth 1 -type d ! -name 'custom_*' -exec rm -rf {} +
+	@rm -rf $(ANSIBLE_GALAXY_ROLES_SUBDIR)
 	@echo "Cleaned up installed Ansible Galaxy roles."
 	@rm -rf $(ANSIBLE_COLLECTIONS_SUBDIR)
 	@echo "Cleaned up installed Ansible Galaxy collections."
