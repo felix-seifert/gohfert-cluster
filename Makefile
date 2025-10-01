@@ -1,10 +1,11 @@
 VENV ?= .venv
-VENV_STAMP := $(VENV)/.stamp
 PYTHON := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
+
 ANSIBLE_PLAYBOOK := $(VENV)/bin/ansible-playbook
 ANSIBLE_GALAXY := $(VENV)/bin/ansible-galaxy
 ANSIBLE_LINT := $(VENV)/bin/ansible-lint
+
 ANSIBLE_SUBDIR := ansible
 ANSIBLE_COLLECTIONS_SUBDIR := $(ANSIBLE_SUBDIR)/ansible_collections
 ANSIBLE_GALAXY_ROLES_SUBDIR := $(ANSIBLE_SUBDIR)/roles_galaxy
@@ -49,9 +50,9 @@ $(TF_SUBDIR)/.terraform: $(TF_SUBDIR)/provider.tf
 	@$(TF) -chdir=$(TF_SUBDIR) init
 	touch $(TF_SUBDIR)/.terraform
 
-venv: $(VENV_STAMP)
+venv: $(VENV)
 
-$(VENV_STAMP): $(PYTHON_REQS_FILE) $(ANSIBLE_REQS_FILE)
+$(VENV): $(PYTHON_REQS_FILE) $(ANSIBLE_REQS_FILE)
 	@python3 -m venv $(VENV)
 	@$(PIP) install --upgrade pip
 	@$(PIP) install -r $(PYTHON_REQS_FILE)
