@@ -28,4 +28,6 @@ the machines provisioned by MAAS. The cluster is implemented as a
 ## Architecture
 
 To visualise the idea of how the different components are architected for deploying a K3s Kubernetes cluster, have a
-look at the [architecture diagram](./docs/explanations/architecture.md).
+look at the [architecture explanation](./docs/content/explanations/architecture.md).
+
+![Architecture Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/felix-seifert/gohfert-cluster/refs/heads/main/docs/content/explanations/architecture.puml)
