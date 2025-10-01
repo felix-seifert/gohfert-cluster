@@ -1,0 +1,7 @@
+.venv-docs
+
+# Dir with mkdocs build artifacts
+site
+
+# Marker Makefile
+.latest-image-built
