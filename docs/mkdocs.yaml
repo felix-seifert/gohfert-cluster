@@ -1,0 +1,29 @@
+site_name: Gohfert Cluster
+site_author: Felix Seifert
+
+repo_url: https://github.com/felix-seiifert/gohfert-cluster
+edit_uri: edit/main/docs/
+
+docs_dir: ./content/
+
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    scheme: slate
+
+nav:
+  - index.md
+  - ADRs:
+      - "01 -- Deploy K3s Through Ansible": adrs/01-deploy-k3s-through-ansible.md
+  - Explanations:
+      - Architecture: explanations/architecture.md
+      - cloud-init: explanations/cloud-init.md
+      - GitHub Actions Runners: explanations/gha-runners.md
+      - K3s High Availability Cluster: explanations/k3s-high-availability-cluster.md
+      - MAAS Provisioning Flow: explanations/provisioning-flow.md
+  - Guides:
+      - Debug Network Discovery: guides/debug-network-discovery.md
+  - References:
+      - Router Settings for MAAS: references/router-settings-for-maas.md

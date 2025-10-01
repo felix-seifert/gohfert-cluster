@@ -7,7 +7,7 @@ A few network settings have to be adjusted so that MAAS works:
 * So that the MAAS server is still available without an overarching DHCP server, it needs to have a static IP address.
   As the router does not provide the DHCP server function anymore, locking the IP address on the router's side does not
   help; the IP address will have to be set on the server itself. This ios achieved with the Ansible role
-  [netplan_ip_setter](../../ansible/roles/netplan_ip_setter).
+  [netplan_ip_setter](https://github.com/felix-seifert/gohfert-cluster/tree/main/ansible/roles/netplan_ip_setter).
 
 For setting the IP address on the server, you first have to be able to connect to the server, i.e. it needs an IP
 address. The following workflow might therefore be a good idea:
