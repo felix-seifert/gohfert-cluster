@@ -65,3 +65,21 @@ jobs:
 
       - name: Push Docker image to ghcr.io
         run: make --directory=docs push-image
+
+      - name: Get Docker image details
+        id: image_details
+        run: |
+          image_name=$(make --directory=docs --no-print-directory print-image-name)
+          image_tag=$(make --directory=docs --no-print-directory print-image-tag)
+
+          echo "image_name=$image_name" >> $GITHUB_OUTPUT
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
+
+  call-update-image-tag:
+    name: Call workflow to update Docker image tag in Kubernetes manifests
+    needs: build-image
+    uses: ./.github/workflows/update_docker_image_tag.yaml
+    with:
+      image: ${{ needs.image_details.outputs.image_name }}
+      tag: ${{ needs.image_details.outputs.image_tag }}
+      app: docs
