@@ -12,6 +12,9 @@ jobs:
   build-image:
     name: Build and push docs image
     runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.image_details.outputs.image_name }}
+      image_tag: ${{ steps.image_details.outputs.image_tag }}
 
     permissions:
       contents: read
@@ -80,6 +83,6 @@ jobs:
     needs: build-image
     uses: ./.github/workflows/update_docker_image_tag.yaml
     with:
-      image: ${{ needs.image_details.outputs.image_name }}
-      tag: ${{ needs.image_details.outputs.image_tag }}
+      image: ${{ needs.build-image.outputs.image_name }}
+      tag: ${{ needs.build-image.outputs.image_tag }}
       app: docs
