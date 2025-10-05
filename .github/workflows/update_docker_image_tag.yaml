@@ -32,6 +32,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-image-tag:
@@ -50,23 +51,32 @@ jobs:
             make update-image IMAGE="${{ inputs.image }}" TAG="${{ inputs.tag }}"
           fi
 
-      - name: Check for changes
+      - name: Check for Kubernetes manifest changes
         id: changes
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
+          if [ -n "$(git status --porcelain ./kubernetes/)" ]; then
             echo "has_changes=true" >> $GITHUB_OUTPUT
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit and push changes
+      - name: Create branch and PR with Kubernetes manifest changes
+        id: pr
         if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # SHA for version 7.0.8
+        with:
+          commit-message: "chore: update ${{ inputs.image }} to tag ${{ inputs.tag }}"
+          title: "chore: update ${{ inputs.image }}"
+          author: Image Tag Updater <image-tag-updater@users.noreply.github.com>
+          add-paths: |
+            ./kubernetes/
+          branch: "update-to-${{ inputs.image }}-${{ inputs.tag }}"
+          base: main
+
+      - name: Print PR details
         run: |
-          git config --local user.email "action@noreply.github.com"
-          git config --local user.name "Image Tag Updater"
-          git add .
-          git commit -m "chore: update ${{ inputs.image }} to tag ${{ inputs.tag }}"
-          git push
+          echo "Created PR ${{ steps.pr.outputs.pull-request-number }} with following URL"
+          echo "${{ steps.pr.outputs.pull-request-url }}"
 
       - name: No changes detected
         if: steps.changes.outputs.has_changes == 'false'
