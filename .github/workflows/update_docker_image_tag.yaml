@@ -61,14 +61,22 @@ jobs:
           fi
 
       - name: Create branch and PR with Kubernetes manifest changes
+        id: pr
         if: steps.changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # SHA for version 7.0.8
         with:
           commit-message: "chore: update ${{ inputs.image }} to tag ${{ inputs.tag }}"
+          title: "chore: update ${{ inputs.image }}"
           author: Image Tag Updater <image-tag-updater@users.noreply.github.com>
           add-paths: |
             ./kubernetes/
           branch: "update-to-${{ inputs.image }}-${{ inputs.tag }}"
+          base: main
+
+      - name: Print PR details
+        run: |
+          echo "Created PR ${{ steps.pr.outputs.pull-request-number }} with following URL"
+          echo "${{ steps.pr.outputs.pull-request-url }}"
 
       - name: No changes detected
         if: steps.changes.outputs.has_changes == 'false'
