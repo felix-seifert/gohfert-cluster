@@ -25,5 +25,11 @@ nav:
       - MAAS Provisioning Flow: explanations/provisioning-flow.md
   - Guides:
       - Debug Network Discovery: guides/debug-network-discovery.md
+      - Deploy Private GHA Runners: guides/deploy-private-gha-runners.md
+      - Provision New Machine: guides/provision-new-machine.md
+      - Reprovision Existing Machine: guides/reprovision-existing-machine.md
   - References:
+      - Client Settings for MAAS: references/client-settings-for-maas.md
+      - Machine Names: references/machine-names.md
       - Router Settings for MAAS: references/router-settings-for-maas.md
+  - Requirements: requirements.md
