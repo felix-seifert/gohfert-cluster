@@ -81,6 +81,7 @@ jobs:
   call-update-image-tag:
     name: Call workflow to update Docker image tag in Kubernetes manifests
     needs: build-image
+    secrets: inherit
     uses: ./.github/workflows/update_docker_image_tag.yaml
     with:
       image: ${{ needs.build-image.outputs.image_name }}
