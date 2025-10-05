@@ -62,10 +62,16 @@ clean: ## Remove virtual environment with installed Python dependencies
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9._-]+:.*?## / {printf "\033[1m\033[36m%-24s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: print-venv-dir print-python-requirements-file
+.PHONY: print-venv-dir print-python-requirements-file print-image-name print-image-tag
 
 print-venv-dir:
 	@echo $(VENV)
 
 print-python-requirements-file:
 	@echo $(REQS_FILE)
+
+print-image-name:
+	@echo $(IMAGE_NAME)
+
+print-image-tag:
+	@echo $(shell cat $(TAG_FILE))
