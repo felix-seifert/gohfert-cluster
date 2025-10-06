@@ -1,0 +1,21 @@
+---
+account:
+  # Required: UNIX username
+  account_name: ""
+
+  # Optional: Full name / description (GECOS)
+  description: ""
+
+  # Optional: Public SSH key to install for the account.
+  # Use either:
+  # - Literal public key string (e.g., 'ssh-ed25519 AAAA... comment')
+  # - GitHub reference in the form 'gh:<github-username>' to import all keys
+  public_ssh_key: ""
+
+  # Optional: Restrict SSH key usage to the given CIDR(s).
+  # Can be a string (single CIDR) or a list of strings.
+  allow_connections_from: []
+
+  # Optional: List of commands or aliases the user can run with NOPASSWD via sudo.
+  # When empty or undefined, no sudoers file is created for the account.
+  sudo_permissions: []

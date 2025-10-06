@@ -1,0 +1,86 @@
+---
+- name: Ensure service account user {{ account.account_name }} exists
+  ansible.builtin.user:
+    name: "{{ account.account_name }}"
+    comment: "{{ account.description | default('') }}"
+    shell: "/bin/bash"
+    create_home: true
+    state: present
+
+- name: Ensure .ssh directory for {{ account.account_name }} exists with correct permissions
+  ansible.builtin.file:
+    path: "/home/{{ account.account_name }}/.ssh"
+    state: directory
+    owner: "{{ account.account_name }}"
+    group: "{{ account.account_name }}"
+    mode: "0700"
+
+- name: Build connections_from options for authorized_key for {{ account.account_name }}
+  ansible.builtin.set_fact:
+    account_connections_from_options: >-
+      {{
+        (
+          'from="' ~ (
+            account.allow_connections_from
+            if account.allow_connections_from is string
+            else (account.allow_connections_from | default([])) | join(',')
+          ) ~ '"'
+        )
+        if account.allow_connections_from is defined and (
+             (account.allow_connections_from is string and account.allow_connections_from | length > 0) or
+             (account.allow_connections_from is iterable and (account.allow_connections_from | length) > 0)
+           )
+        else omit
+      }}
+  when:
+    - account.public_ssh_key is defined
+
+- name: "Install GitHub SSH public keys when public_ssh_key starts with `gh:` for {{ account.account_name }}"
+  vars:
+    gh_user: "{{ (account.public_ssh_key | string).split(':', 1)[1] }}"
+  ansible.posix.authorized_key:
+    user: "{{ account.account_name }}"
+    key: "{{ lookup('community.general.github_keys', gh_user) }}"
+    key_options: "{{ account_connections_from_options | default(omit) }}"
+    manage_dir: false
+    path: "/home/{{ account.account_name }}/.ssh/authorized_keys"
+  when:
+    - account.public_ssh_key is defined
+    - (account.public_ssh_key | string).startswith('gh:')
+
+- name: Install provided SSH public keys for {{ account.account_name }} (non-GitHub keys)
+  ansible.posix.authorized_key:
+    user: "{{ account.account_name }}"
+    key: "{{ account.public_ssh_key }}"
+    key_options: "{{ account_connections_from_options | default(omit) }}"
+    manage_dir: false
+    path: "/home/{{ account.account_name }}/.ssh/authorized_keys"
+  when:
+    - account.public_ssh_key is defined
+    - not (account.public_ssh_key | string).startswith('gh:')
+
+- name: Check if authorized_keys exists for {{ account.account_name }}
+  ansible.builtin.stat:
+    path: "/home/{{ account.account_name }}/.ssh/authorized_keys"
+  register: account_authorized_keys_stat
+
+- name: Ensure authorized_keys for {{ account.account_name }} has correct permissions
+  ansible.builtin.file:
+    path: "/home/{{ account.account_name }}/.ssh/authorized_keys"
+    state: file
+    owner: "{{ account.account_name }}"
+    group: "{{ account.account_name }}"
+    mode: "0600"
+  when: account_authorized_keys_stat.stat.exists | default(false)
+
+- name: Configure sudoers for {{ account.account_name }} with sudo_permissions
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ account.account_name }}"
+    owner: root
+    group: root
+    mode: "0440"
+    content: "{{ account.account_name }} ALL=(ALL) NOPASSWD: {{ (account.sudo_permissions | list) | join(',') }}\n"
+    validate: "visudo -cf %s"
+  when:
+    - account.sudo_permissions is defined
+    - (account.sudo_permissions | length) > 0

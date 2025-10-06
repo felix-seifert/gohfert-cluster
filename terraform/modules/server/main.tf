@@ -42,4 +42,10 @@ resource "maas_instance" "this" {
     name        = maas_network_interface_physical.this.name
     subnet_cidr = "192.168.150.0/24"
   }
+
+  lifecycle {
+    ignore_changes = [
+      deploy_params[0].user_data
+    ]
+  }
 }
