@@ -1,0 +1,10 @@
+---
+account:
+  # Required: UNIX username to remove
+  account_name: ""
+
+  # Optional: Whether to remove the user's home directory
+  remove_home: true
+
+  # Optional: Whether to force removal even if the user is logged in
+  force: false

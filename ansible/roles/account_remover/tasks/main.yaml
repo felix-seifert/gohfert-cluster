@@ -1,0 +1,26 @@
+---
+- name: Remove sudoers file of {{ account.account_name }} if present
+  ansible.builtin.file:
+    path: "/etc/sudoers.d/{{ account.account_name }}"
+    state: absent
+  become: true
+
+- name: Remove authorized_keys of {{ account.account_name }} if present
+  ansible.builtin.file:
+    path: "/home/{{ account.account_name }}/.ssh/authorized_keys"
+    state: absent
+  become: true
+
+- name: Remove .ssh directory of {{ account.account_name }} if present
+  ansible.builtin.file:
+    path: "/home/{{ account.account_name }}/.ssh"
+    state: absent
+  become: true
+
+- name: Remove user {{ account.account_name }}
+  ansible.builtin.user:
+    name: "{{ account.account_name }}"
+    state: absent
+    remove: "{{ account.remove_home | default(true) }}"
+    force: "{{ account.force | default(false) }}"
+  become: true
