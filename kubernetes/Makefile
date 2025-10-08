@@ -1,9 +1,9 @@
 KUBECTL ?= kubectl
 K8S_RESOURCES_DIR := .
 
-# Arg APP is used to define applying resources only for specific app/subdir
-ifdef APP
-  TARGET_DIR := $(K8S_RESOURCES_DIR)/$(APP)
+# Arg DIR is used to define applying resources only for specific app/subdir
+ifdef DIR
+  TARGET_DIR := $(K8S_RESOURCES_DIR)/$(DIR)
 else
   TARGET_DIR := $(K8S_RESOURCES_DIR)
 endif
@@ -12,21 +12,21 @@ endif
 
 .DEFAULT_GOAL := help
 
-apply-namespaces: ## Apply all namespaces defined in YAML files (of specific APP if specified)
+apply-namespaces: ## Apply all namespaces defined in YAML files (of specific DIR if specified)
 	@echo "Applying all manifests with kind Namespace from $(TARGET_DIR)/..."
 	@find $(TARGET_DIR) -type f -name "*.yaml" -o -name "*.yml" \
 		| xargs grep --files-with-matches "^kind: *Namespace" \
 		| xargs --no-run-if-empty $(KUBECTL) apply --filename
 
-apply-all: ## Apply all resources (also namespaces) defined in YAML files (of specific APP if specified)
+apply-all: ## Apply all resources (also namespaces) defined in YAML files (of specific DIR if specified)
 	@echo "Applying all Kubernetes manifests from $(TARGET_DIR)/..."
 	@$(KUBECTL) apply --filename $(TARGET_DIR)
 
-apply: apply-namespaces apply-all ## Apply first namespaces and then all resources defined in YAML files (of specific APP if specified)
+apply: apply-namespaces apply-all ## Apply first namespaces and then all resources defined in YAML files (of specific DIR if specified)
 
-update-image: ## Update tag of given IMAGE to TAG of all resources defined in YAML files (of specific APP if specified)
+update-image: ## Update tag of given IMAGE to TAG of all resources defined in YAML files (of specific DIR if specified)
 	@if [ -z "$(IMAGE)" ] || [ -z "$(TAG)" ]; then \
-		echo "Usage: make update-image IMAGE=<image> TAG=<tag> [APP=<app>]"; \
+		echo "Usage: make update-image IMAGE=<image> TAG=<tag> [DIR=<subdirectory>]"; \
 		exit 1; \
 	fi
 	@echo "Updating image '$(IMAGE)' to tag '$(TAG)' in $(TARGET_DIR)/..."
