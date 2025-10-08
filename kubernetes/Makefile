@@ -69,12 +69,12 @@ update-image: ## Update tag of given IMAGE to TAG of all resources defined in YA
 			fi; \
 		done
 
-print-decoded-token: ## Print base64 decoded token of secret which is passed as NAME
-	@if [ -z "$(NAME)" ]; then \
-		echo "Usage: make print-base64-token NAME=<secret-name>"; \
+print-decoded-token: ## Print base64 decoded token of secret which is passed as SECRET_NAME
+	@if [ -z "$(SECRET_NAME)" ]; then \
+		echo "Usage: make print-decoded-token SECRET_NAME=<secret-name>"; \
 		exit 1; \
-    fi
-	@NAME=$(NAME) ; \
+	fi
+	@NAME=$(SECRET_NAME) ; \
 	NAMESPACE=$$(kubectl get secrets --all-namespaces --output jsonpath='{range .items[?(@.metadata.name=="'"$$NAME"'")]}{.metadata.namespace}{"\n"}{end}') ; \
 	if [ -z "$$NAMESPACE" ]; then \
 		echo "Secret $$NAME not found in any namespace." >&2 ; exit 1 ; \
@@ -84,6 +84,25 @@ print-decoded-token: ## Print base64 decoded token of secret which is passed as 
 		echo "Token not found in secret $$NAME in namespace $$NAMESPACE." >&2 ; exit 1 ; \
 	fi ; \
 	echo $$TOKEN
+
+print-ca-cert: ## Print base64 encoded CA cert data of secret which is passed as SECRET_NAME
+	@if [ -z "$(SECRET_NAME)" ]; then \
+		echo "Usage: make print-ca-cert SECRET_NAME=<secret-name>"; \
+		exit 1; \
+    fi
+	@NAME=$(SECRET_NAME) ; \
+	NAMESPACE=$$(kubectl get secrets --all-namespaces --output jsonpath='{range .items[?(@.metadata.name=="'"$$NAME"'")]}{.metadata.namespace}{"\n"}{end}') ; \
+	if [ -z "$$NAMESPACE" ]; then \
+		echo "Secret $$NAME not found in any namespace." >&2 ; exit 1 ; \
+	fi ; \
+	CA_CERT_DATA=$$(kubectl get secret $$NAME -n $$NAMESPACE -o jsonpath='{.data.ca\.crt}') ; \
+	if [ -z "$$CA_CERT_DATA" ]; then \
+		echo "Token not found in secret $$NAME in namespace $$NAMESPACE." >&2 ; exit 1 ; \
+	fi ; \
+	echo $$CA_CERT_DATA
+
+print-api-url: ## Print URL of Kubernetes API server from `kubectl config view`
+	@echo $$($(KUBECTL) config view --minify -o jsonpath='{.clusters[0].cluster.server}')
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9._-]+:.*?## / {printf "\033[1m\033[36m%-24s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
