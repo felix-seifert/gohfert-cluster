@@ -16,11 +16,11 @@ apply-namespaces: ## Apply all namespaces defined in YAML files (of specific DIR
 	@echo "Applying all manifests with kind Namespace from $(TARGET_DIR)/..."
 	@find $(TARGET_DIR) -type f -name "*.yaml" -o -name "*.yml" \
 		| xargs grep --files-with-matches "^kind: *Namespace" \
-		| xargs --no-run-if-empty $(KUBECTL) apply --filename
+		| xargs --no-run-if-empty --max-args=1 $(KUBECTL) apply --filename
 
 apply-all: ## Apply all resources (also namespaces) defined in YAML files (of specific DIR if specified)
 	@echo "Applying all Kubernetes manifests from $(TARGET_DIR)/..."
-	@$(KUBECTL) apply --filename $(TARGET_DIR)
+	@$(KUBECTL) apply --recursive --filename $(TARGET_DIR)
 
 apply: apply-namespaces apply-all ## Apply first namespaces and then all resources defined in YAML files (of specific DIR if specified)
 
