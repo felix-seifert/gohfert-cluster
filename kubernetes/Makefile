@@ -8,19 +8,40 @@ else
   TARGET_DIR := $(K8S_RESOURCES_DIR)
 endif
 
+empty :=
+space := $(empty) $(empty)
+comma := ,
+
+define replace_commas_with_spaces
+  $(subst $(comma),$(space),$(strip $(1)))
+endef
+
+# SKIP_DIR (optional) - comma-separated list of dirs to skip under TARGET_DIR
+SKIP_DIRS := $(strip $(SKIP_DIR))
+SPACE_SEPARATED_SKIP_DIRS := $(call replace_commas_with_spaces,$(SKIP_DIRS))
+
+define generate_skip_dirs_through_prune
+	$(foreach dir,$(SPACE_SEPARATED_SKIP_DIRS),-path $(TARGET_DIR)/$(dir) -o) -false
+endef
+
 .PHONY: apply-namespaces apply-all apply update-image print-decoded-token help
 
 .DEFAULT_GOAL := help
 
 apply-namespaces: ## Apply all namespaces defined in YAML files (of specific DIR if specified)
-	@echo "Applying all manifests with kind Namespace from $(TARGET_DIR)/..."
-	@find $(TARGET_DIR) -type f -name "*.yaml" -o -name "*.yml" \
+	@echo "Applying all manifests with kind Namespace from $(TARGET_DIR)/ (excluding SKIP_DIRS $(SKIP_DIRS))..."
+	@find $(TARGET_DIR) \
+		\( $(call generate_skip_dirs_through_prune) \) -prune -o \
+		\( -type f \( -name "*.yaml" -o -name "*.yml" \) \) -print \
 		| xargs grep --files-with-matches "^kind: *Namespace" \
 		| xargs --no-run-if-empty --max-args=1 $(KUBECTL) apply --filename
 
 apply-all: ## Apply all resources (also namespaces) defined in YAML files (of specific DIR if specified)
-	@echo "Applying all Kubernetes manifests from $(TARGET_DIR)/..."
-	@$(KUBECTL) apply --recursive --filename $(TARGET_DIR)
+	@echo "Applying all Kubernetes manifests from $(TARGET_DIR)/ (excluding SKIP_DIRS $(SKIP_DIRS))..."
+	@find $(TARGET_DIR) \
+		\( $(call generate_skip_dirs_through_prune) \) -prune -o \
+		\( -type f \( -name "*.yaml" -o -name "*.yml" \) \) -print \
+		| xargs --no-run-if-empty --max-args=1 $(KUBECTL) apply --filename
 
 apply: apply-namespaces apply-all ## Apply first namespaces and then all resources defined in YAML files (of specific DIR if specified)
 
