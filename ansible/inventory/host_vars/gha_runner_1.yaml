@@ -1,0 +1,6 @@
+---
+# SHA512 checksum for kubernetes-client-linux-arm64.tar.gz
+# Retrieved from https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.34.md#v1341
+k_checksum_archive: >
+  "sha512:279832e1ac95532807aeb68ed951e8099300e3cd4a09f1d829c4b0197e0010d18d1de19e54f73b0ab7f104ee5670ef4897127432fac42867b7a727d75dc8bd48"
+k_arch: arm64

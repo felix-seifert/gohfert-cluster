@@ -46,6 +46,13 @@
       when: gha_runner_state == 'started'
 
   roles:
+    - role: githubixx.kubectl
+      vars:
+        kubectl_version: "{{ k_version }}"
+        kubectl_checksum_archive: "{{ k_checksum_archive }}"
+        kubectl_arch: "{{ k_arch }}"
+      tags: [deploy]
+
     - role: monolithprojects.github_actions_runner
       vars:
         access_token: "{{ github_pat }}"
