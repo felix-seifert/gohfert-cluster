@@ -15,7 +15,9 @@ users:
 %{ for acct in service_accounts ~}
   - name: "${acct.account_name}"
     gecos: "${acct.description}"
+%{ if length(try(acct.sudo_permissions, [])) > 0 }
     sudo: "ALL=(ALL) NOPASSWD: ${join(",", acct.sudo_permissions)}"
+%{ endif }
     shell: /bin/bash
 %{ if startswith(acct.public_ssh_key, "gh:") }
     ssh_import_id:
