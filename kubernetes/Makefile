@@ -37,14 +37,14 @@ apply-namespaces: ## Apply all namespaces defined in YAML files (of specific DIR
 		\( $(call generate_skip_dirs_through_prune) \) -prune -o \
 		\( -type f \( -name "*.yaml" -o -name "*.yml" \) \) -print \
 		| xargs grep --files-with-matches "^kind: *Namespace" \
-		| xargs --no-run-if-empty --max-args=1 $(KUBECTL) apply --filename
+		| xargs --no-run-if-empty -I{} sh -c 'KUBECONFIG="$(KUBECONFIG)" $(KUBECTL) apply --filename "{}"'
 
 apply-all: ## Apply all resources (also namespaces) defined in YAML files (of specific DIR if specified)
 	@echo "Applying all Kubernetes manifests from $(TARGET_DIR)/ (excluding SKIP_DIRS $(SKIP_DIRS))..."
 	@find $(TARGET_DIR) \
 		\( $(call generate_skip_dirs_through_prune) \) -prune -o \
 		\( -type f \( -name "*.yaml" -o -name "*.yml" \) \) -print \
-		| xargs --no-run-if-empty --max-args=1 $(KUBECTL) apply --filename
+		| xargs --no-run-if-empty -I{} sh -c 'KUBECONFIG="$(KUBECONFIG)" $(KUBECTL) apply --filename "{}"'
 
 apply: apply-namespaces apply-all ## Apply first namespaces and then all resources defined in YAML files (of specific DIR if specified)
 
