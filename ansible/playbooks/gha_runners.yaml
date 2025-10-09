@@ -19,7 +19,13 @@
     - name: Set gha_runner_state to absent if remove is tagged
       ansible.builtin.set_fact:
         gha_runner_state: absent
-      tags: [remove]
+      tags: always
+      when: "'remove' in ansible_run_tags"
+
+    - name: Show gha_runner_state
+      ansible.builtin.debug:
+        var: gha_runner_state
+      tags: always
 
     - name: Ensure runner user presence
       ansible.builtin.user:
@@ -40,6 +46,13 @@
       when: gha_runner_state == 'started'
 
   roles:
+    - role: githubixx.kubectl
+      vars:
+        kubectl_version: "{{ k_version }}"
+        kubectl_checksum_archive: "{{ k_checksum_archive }}"
+        kubectl_arch: "{{ k_arch }}"
+      tags: [deploy]
+
     - role: monolithprojects.github_actions_runner
       vars:
         access_token: "{{ github_pat }}"
@@ -54,13 +67,14 @@
       tags: always
 
   post_tasks:
-    - name: Kill processes if of runner user when stopping runner
+    - name: Kill processes of runner user when stopping runner
       ansible.builtin.shell: "pkill -u {{ gha_runner_user }} || true"
       become: true
       register: pkill_result
       changed_when: pkill_result.rc == 0
       failed_when: false   # ignore failures when no process exists
       tags: [remove]
+      when: gha_runner_state == 'absent'
 
     - name: Ensure runner user absence
       ansible.builtin.user:
@@ -68,3 +82,4 @@
         state: absent
         remove: true
       tags: [remove]
+      when: gha_runner_state == 'absent'

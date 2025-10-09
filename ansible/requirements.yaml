@@ -9,6 +9,11 @@ roles:
     version: ed4b47a28940824d5b25822df41c638e5eba96a5 # 1.26.0
     src: https://github.com/MonolithProjects/ansible-github_actions_runner
 
+  # For installing kubectl
+  - name: githubixx.kubectl
+    src: https://github.com/githubixx/ansible-role-kubectl.git
+    version: d2154fe5270ebfc949326b29b24972ffe6ee4607 # 23.4.0+1.32.7
+
 collections:
   # For deploying K3s cluster
   - name: https://github.com/timothystewart6/k3s-ansible
