@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: docs-ns
+  name: service-account-ns
 ---
 # RoleBinding for CI service account
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: svc-gha-kubectl-apply-rolebinding
-  namespace: docs-ns
+  namespace: service-account-ns
 subjects:
   - kind: ServiceAccount
     name: svc-gha-kubectl-apply
