@@ -41,9 +41,8 @@ jobs:
         uses: peter-evans/repository-dispatch@de78ac1a711fc6f29e77338f843065faf5335227 # Commit from 19 Sep 2025
         env:
           CHANGED_SUBDIRS: ${{ steps.changed-subdirs.outputs.changed_subdirs }}
-          TRIGGERING_TOKEN: ${{ secrets.PAT_FOR_TRIGGERING_PRIVATE_WORKFLOWS }}
         with:
-          token: $TRIGGERING_TOKEN
+          token: ${{ secrets.PAT_FOR_TRIGGERING_PRIVATE_WORKFLOWS }}
           repository: felix-seifert/gohfert-cluster-private-runners
           event-type: kubernetes-manifests-apply
           client-payload: '{"ref": "${{ github.ref }}", "changed_kubernetes_subdirs": "$CHANGED_SUBDIRS"}'
