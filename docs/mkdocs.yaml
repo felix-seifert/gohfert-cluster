@@ -17,7 +17,7 @@ nav:
   - index.md
   - ADRs:
       - "01 -- Deploy K3s Through Ansible": adrs/01-deploy-k3s-through-ansible.md
-        "02 -- Use Makefiles for CI Commands": adrs/02-use-makefiles-for-ci-commands.md
+      - "02 -- Use Makefiles for CI Commands": adrs/02-use-makefiles-for-ci-commands.md
   - Explanations:
       - Architecture: explanations/architecture.md
       - cloud-init: explanations/cloud-init.md
