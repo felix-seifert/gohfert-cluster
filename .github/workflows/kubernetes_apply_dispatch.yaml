@@ -25,7 +25,6 @@ jobs:
             kubernetes/**
 
       - name: Extract changed subdirs from changed files
-        id: changed-subdirs
         run: |
           changed_subdirs=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" \
             | grep '^kubernetes/' \
@@ -35,12 +34,10 @@ jobs:
 
           echo "Changed subdirectories: $changed_subdirs"
 
-          echo "changed_subdirs=$changed_subdirs" >> $GITHUB_OUTPUT
+          echo "CHANGED_SUBDIRS=$changed_subdirs" >> $GITHUB_ENV
 
       - name: Trigger Kubernetes manifest application
         uses: peter-evans/repository-dispatch@de78ac1a711fc6f29e77338f843065faf5335227 # Commit from 19 Sep 2025
-        env:
-          CHANGED_SUBDIRS: ${{ steps.changed-subdirs.outputs.changed_subdirs }}
         with:
           token: ${{ secrets.PAT_FOR_TRIGGERING_PRIVATE_WORKFLOWS }}
           repository: felix-seifert/gohfert-cluster-private-runners
