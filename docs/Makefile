@@ -8,6 +8,8 @@ MKDOCS := $(VENV)/bin/mkdocs
 REQS_FILE := requirements.txt
 CONFIG_FILE := mkdocs.yaml
 
+DOCS_OUTPUT_DIR := site
+
 DOCKER := docker
 
 REGISTRY := ghcr.io
@@ -41,7 +43,7 @@ serve: venv ## Serve local dev deployment of mkdocs with live reloads
 	@$(MKDOCS) serve --config-file $(CONFIG_FILE) --dirtyreload
 
 build-site: venv ## Let mkdocs build static documentation site artifacts
-	@$(MKDOCS) build --config-file $(CONFIG_FILE) --clean
+	@$(MKDOCS) build --config-file $(CONFIG_FILE) --site-dir $(DOCS_OUTPUT_DIR) --clean
 
 build-image: $(TAG_FILE) ## Build Docker image containing static site artifacts
 

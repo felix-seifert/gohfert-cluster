@@ -1,0 +1,23 @@
+name: Lint Docs
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - docs/**
+
+jobs:
+  lint-docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # SHA for version 5.0.0
+
+      - name: Setup docs env with Python and dependencies
+        uses: ./.github/actions/prepare-docs-env-composite-action
+
+      - name: Build static documentation pages
+        run: make --directory=docs build-site
