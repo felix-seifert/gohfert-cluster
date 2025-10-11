@@ -14,14 +14,13 @@ runs:
     - name: Get environment info
       id: env_info
       run: |
-        run: |
-          venv_dir=docs/$(make --directory=docs --no-print-directory print-venv-dir)
-          python_reqs_file=docs/$(make --directory=docs --no-print-directory print-python-requirements-file)
+        venv_dir=docs/$(make --directory=docs --no-print-directory print-venv-dir)
+        python_reqs_file=docs/$(make --directory=docs --no-print-directory print-python-requirements-file)
 
-          echo "venv_dir=$venv_dir" >> $GITHUB_OUTPUT
+        echo "venv_dir=$venv_dir" >> $GITHUB_OUTPUT
 
-          # GitHub’s hashFiles isn’t available here, so use sha256sum
-          echo "python_hash=$(sha256sum $python_reqs_file | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        # GitHub’s hashFiles isn’t available here, so use sha256sum
+        echo "python_hash=$(sha256sum $python_reqs_file | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Cache docs venv
