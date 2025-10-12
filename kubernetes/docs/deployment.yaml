@@ -22,6 +22,6 @@ spec:
     spec:
       containers:
         - name: docs
-          image: ghcr.io/felix-seifert/gohfert-cluster-docs:20251010-085959
+          image: ghcr.io/felix-seifert/gohfert-cluster-docs:20251012-104956
           ports:
             - containerPort: 80
