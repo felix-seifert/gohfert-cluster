@@ -4,10 +4,12 @@ PYTHON := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 
 MKDOCS := $(VENV)/bin/mkdocs
+PYMARKDOWN := $(VENV)/bin/pymarkdown
 
 REQS_FILE := requirements.txt
 CONFIG_FILE := mkdocs.yaml
 
+DOCS_CONTENT_DIR := content
 DOCS_OUTPUT_DIR := site
 
 DOCKER := docker
@@ -38,6 +40,10 @@ $(VENV_STAMP): $(REQS_FILE)
 	@$(PIP) install --upgrade pip
 	@$(PIP) install -r $(REQS_FILE)
 	touch $@
+
+lint: venv
+	@echo "Running Markdown linting..."
+	@$(PYMARKDOWN) --config pymarkdownlnt.yaml scan $(DOCS_CONTENT_DIR) --recurse
 
 serve: venv ## Serve local dev deployment of mkdocs with live reloads
 	@$(MKDOCS) serve --config-file $(CONFIG_FILE) --dirtyreload

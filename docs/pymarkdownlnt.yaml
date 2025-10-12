@@ -1,0 +1,7 @@
+---
+plugins:
+  line-length:
+    code_blocks: false
+    line_length: 120
+  ul-indent:
+    enabled: false

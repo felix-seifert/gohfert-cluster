@@ -9,7 +9,7 @@ on:
 
 jobs:
   lint-docs:
-    name: Build docs
+    name: Lint and build docs
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +18,9 @@ jobs:
 
       - name: Setup docs env with Python and dependencies
         uses: ./.github/actions/prepare-docs-env-composite-action
+
+      - name: Run Markdown linting
+        run: make --directory=docs lint
 
       - name: Build static documentation pages
         run: make --directory=docs build-site
