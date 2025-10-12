@@ -17,17 +17,17 @@ Makefiles provide a consistent and discoverable interface to common tasks across
 
 ## Options
 
-1. **Write commands directly in CI workflows**
+1. Write commands directly in CI workflows
     * Keeps everything in one YAML file
     * Limited reusability CI when using another CI system
     * Harder for developers to replicate the same flow locally
 
-2. **Use separate shell/Python scripts**
+2. Use separate shell/Python scripts
     * Allows reusing logic in CI and locally
     * Requires remembering file names and arguments or investing significant effort for developing a strict framework
     * Can fragment into multiple small scripts which require knowledge about how to chain them together
 
-3. **Define commands in Makefile**
+3. Define commands in Makefile
     * Provides a single entry point (`make <target>`) for all build/test/deploy tasks
     * Easy for developers to run the same commands locally that CI runs
     * Commands are grouped and discoverable (`make help`), and can programmatically chained together

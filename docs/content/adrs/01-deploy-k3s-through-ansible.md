@@ -29,6 +29,9 @@ The following options are considered for addressing the â€œcloud-init runs onceâ
 
 > Adopt Terraform for hardware provisioning (MAAS) and Ansible for K3s deployment
 
+[//]: # (Comment to make linter happy with two separate block quotes following each other)
+[//]: # (See details of linting rule: https://pymarkdown.readthedocs.io/en/latest/plugins/rule_md028/)
+
 > [!NOTE]
 > As a proper HA cluster benefits from having a virtual IP for the control plane and non-cloud Kubernetes clusters
 > require an own load balancer, I decided on using the common implementations kube-vip and MetalLB. Installing and

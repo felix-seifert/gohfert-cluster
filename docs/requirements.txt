@@ -1,1 +1,2 @@
 mkdocs-material==9.6.20
+pymarkdownlnt==0.9.32
