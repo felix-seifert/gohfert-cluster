@@ -1,1 +1,7 @@
-test: DUMMY
+# Unencrypted dummy
+vault_maas_postgres_user: db_user
+vault_maas_postgres_pw: 5678geheim%
+
+vault_maas_admin_user: maas-admin-user
+vault_maas_admin_email: maas-admin@email.com
+vault_maas_admin_pw: 1234secret!
