@@ -1,2 +1,2 @@
 # Unencrypted dummy
-vault_github_pat: appropriate-github-pat
+vault_github_pat: github-pat-for-triggering-workflows-in-private-repo
