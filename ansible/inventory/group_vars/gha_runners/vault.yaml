@@ -1,2 +1,2 @@
 # Unencrypted dummy
-vault_github_pat: github-pat-for-triggering-workflows-in-private-repo
+vault_github_pat: github-pat-for-registering-runner-in-private-repo
