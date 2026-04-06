@@ -6,13 +6,13 @@ roles:
 
   # For installing self-hosted GitHub Actions runner
   - name: monolithprojects.github_actions_runner
-    version: ed4b47a28940824d5b25822df41c638e5eba96a5 # 1.26.0
+    version: 436f45b0e0d5b69df82cf5414c2786e63f0d4fc0 # 1.27.0
     src: https://github.com/MonolithProjects/ansible-github_actions_runner
 
   # For installing kubectl
   - name: githubixx.kubectl
     src: https://github.com/githubixx/ansible-role-kubectl.git
-    version: d2154fe5270ebfc949326b29b24972ffe6ee4607 # 23.4.0+1.32.7
+    version: 45473959052c83b81f2a852306407c4222e47d0d # 26.0.0+1.35.1
 
 collections:
   # For deploying K3s cluster
