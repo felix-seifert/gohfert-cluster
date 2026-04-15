@@ -10,5 +10,6 @@ following specific tooling:
        `$Home/.kube/config` from one of your master nodes to your local machine at the same location.
         * The used Ansible collection `techno_tim.k3s_ansible` already copies the kubeconfig to its playbook dir and you
           can also take it from there.
+        * A Makefile target helps cpying the kubectl config locally.
     2. On the master nodes, kubectl already intends to connect to the virtual IP of the master nodes, i.e. any available
        master node, and the address will not have to be adjusted anymore.
