@@ -21,6 +21,7 @@ nav:
   - Explanations:
       - Architecture: explanations/architecture.md
       - cloud-init: explanations/cloud-init.md
+      - DNS for Deployed K8s Services: explanations/dns-for-deployed-k8s-services.md
       - GitHub Actions Runners: explanations/gha-runners.md
       - K3s High Availability Cluster: explanations/k3s-high-availability-cluster.md
       - MAAS Provisioning Flow: explanations/provisioning-flow.md
