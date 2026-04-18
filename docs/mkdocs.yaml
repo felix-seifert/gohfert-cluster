@@ -13,6 +13,18 @@ theme:
   palette:
     scheme: slate
 
+markdown_extensions:
+  - plantuml_markdown:
+      server: http://www.plantuml.com/plantuml
+      format: svg
+      base_dir: ./content
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          # yamllint disable-line rule:truthy
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
 nav:
   - index.md
   - ADRs:
