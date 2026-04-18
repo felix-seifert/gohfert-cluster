@@ -41,7 +41,7 @@ $(VENV_STAMP): $(REQS_FILE)
 	@$(PIP) install -r $(REQS_FILE)
 	touch $@
 
-lint: venv
+lint: venv ## Lint markdown files
 	@echo "Running Markdown linting..."
 	@$(PYMARKDOWN) --config pymarkdownlnt.yaml scan $(DOCS_CONTENT_DIR) --recurse
 
