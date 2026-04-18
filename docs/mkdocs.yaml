@@ -1,7 +1,7 @@
 site_name: Gohfert Cluster
 site_author: Felix Seifert
 
-repo_url: https://github.com/felix-seiifert/gohfert-cluster
+repo_url: https://github.com/felix-seifert/gohfert-cluster
 edit_uri: edit/main/docs/
 
 docs_dir: ./content/
