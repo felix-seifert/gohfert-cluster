@@ -26,9 +26,11 @@ jobs:
 
       - name: Extract changed subdirs from changed files
         run: |
+          # Exclude service_accounts - CI service account cannot modify its own RBAC permissions
           changed_subdirs=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" \
             | grep '^kubernetes/' \
             | cut --delimiter '/' -f2 \
+            | grep -v '^service_accounts$' \
             | sort --unique \
             | paste --serial --delimiter "," -)
 
