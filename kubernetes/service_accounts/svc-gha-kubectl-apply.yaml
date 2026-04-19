@@ -62,3 +62,16 @@ rules:
       - create
       - update
       - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: svc-gha-kubectl-apply-clusterrolebinding
+subjects:
+  - kind: ServiceAccount
+    name: svc-gha-kubectl-apply
+    namespace: service-account-ns
+roleRef:
+  kind: ClusterRole
+  name: svc-gha-kubectl-apply-clusterrole
+  apiGroup: rbac.authorization.k8s.io
