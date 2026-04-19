@@ -2,18 +2,3 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: service-account-ns
----
-# RoleBinding for CI service account
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: svc-gha-kubectl-apply-rolebinding
-  namespace: service-account-ns
-subjects:
-  - kind: ServiceAccount
-    name: svc-gha-kubectl-apply
-    namespace: service-account-ns
-roleRef:
-  kind: ClusterRole
-  name: svc-gha-kubectl-apply-clusterrole
-  apiGroup: rbac.authorization.k8s.io
