@@ -1,0 +1,25 @@
+# Customise built-in Traefik with k3s's HelmChartConfig CRD.
+# There is no need to manage Helm directly.
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  # podAntiAffinity ensures that the Traefik replicas land
+  # on different pods to achieve HA
+  valuesContent: |-
+    deployment:
+      replicas: 3
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: traefik
+              topologyKey: kubernetes.io/hostname
