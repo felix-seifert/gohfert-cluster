@@ -32,6 +32,7 @@ nav:
       - "02 -- Use Makefiles for CI Commands": adrs/02-use-makefiles-for-ci-commands.md
   - Explanations:
       - Architecture: explanations/architecture.md
+      - Certificates for TLS: explanations/ca-certs.md
       - cloud-init: explanations/cloud-init.md
       - DNS for Deployed K8s Services: explanations/dns-for-deployed-k8s-services.md
       - GitHub Actions Runners: explanations/gha-runners.md
@@ -43,6 +44,7 @@ nav:
       - Provision New Machine: guides/provision-new-machine.md
       - Reprovision Existing Machine: guides/reprovision-existing-machine.md
   - References:
+      - Certificates for TLS: references/ca-certs.md
       - Client Settings for MAAS: references/client-settings-for-maas.md
       - Machine Names: references/machine-names.md
       - Router Settings for MAAS: references/router-settings-for-maas.md
