@@ -1,0 +1,35 @@
+# Bootstrap issuer, creates CA certificate
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-bootstrap
+spec:
+  selfSigned: {}
+---
+# CA Certificate, signed by bootstrap issuer
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gohfert-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: Gohfert Home Lab CA
+  secretName: gohfert-ca-secret
+  duration: 8760h # 1 years
+  renewBefore: 720h # 30 days
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-bootstrap
+    kind: ClusterIssuer
+---
+# CA Issuer, uses CA certificate to sign other certs
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: gohfert-ca-issuer
+spec:
+  ca:
+    secretName: gohfert-ca-secret

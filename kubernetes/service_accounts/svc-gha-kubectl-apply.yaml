@@ -66,6 +66,19 @@ rules:
   - apiGroups: ["helm.cattle.io"]
     resources:
       - helmchartconfigs
+      - helmcharts
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+
+  - apiGroups: ["cert-manager.io"]
+    resources:
+      - clusterissuers
+      - certificates
     verbs:
       - get
       - list
