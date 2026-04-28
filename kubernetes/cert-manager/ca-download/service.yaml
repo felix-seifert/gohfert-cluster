@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ca-download-service
+  namespace: cert-manager
+spec:
+  selector:
+    app: ca-download
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
