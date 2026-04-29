@@ -20,6 +20,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources:
+      - configmaps
       - services
       - namespaces
     verbs:
