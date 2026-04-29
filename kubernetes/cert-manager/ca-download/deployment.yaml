@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ca-download-page
+  namespace: cert-manager
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Install Gohfert Home Lab Certificate</title>
+      <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        h1 { color: #333; }
+        .download-btn { display: inline-block; background: #007bff; color: white; padding: 15px 30px;
+                        text-decoration: none; border-radius: 5px; margin: 20px 0; font-size: 18px; }
+        .download-btn:hover { background: #0056b3; }
+        details { margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+        summary { cursor: pointer; font-weight: bold; }
+        code { background: #e0e0e0; padding: 2px 6px; border-radius: 3px; }
+      </style>
+    </head>
+    <body>
+      <h1>Gohfert Home Lab</h1>
+      <p>To access internal services securely, install this certificate:</p>
+
+      <a href="/gohfert-ca.crt" class="download-btn">Download Certificate</a>
+
+      <h2>Installation Instructions</h2>
+
+      <details>
+        <summary>Linux (Ubuntu, Debian, etc.)</summary>
+        <ol>
+          <li>Click Download Certificate above</li>
+          <li>Open a terminal and run:</li>
+          <li><code>sudo cp ~/Downloads/gohfert-ca.crt /usr/local/share/ca-certificates/</code></li>
+          <li><code>sudo update-ca-certificates</code></li>
+          <li>Restart your browser</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>NixOS</summary>
+        <ol>
+          <li>Click Download Certificate above</li>
+          <li>Copy the certificate to a persistent location, e.g.:</li>
+          <li><code>sudo cp ~/Downloads/gohfert-ca.crt /etc/nixos/certs/</code></li>
+          <li>Add to your <code>configuration.nix</code>:</li>
+          <li><code>security.pki.certificateFiles = [ /etc/nixos/certs/gohfert-ca.crt ];</code></li>
+          <li>Run <code>sudo nixos-rebuild switch</code></li>
+          <li>Restart your browser</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>macOS</summary>
+        <ol>
+          <li>Click Download Certificate above</li>
+          <li>Open the downloaded file</li>
+          <li>Keychain Access will open - select "System" keychain</li>
+          <li>Double-click the certificate → Trust → "Always Trust"</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>Windows</summary>
+        <ol>
+          <li>Click Download Certificate above</li>
+          <li>Double-click the downloaded file</li>
+          <li>Click "Install Certificate"</li>
+          <li>Select "Local Machine" → "Trusted Root Certification Authorities"</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>Android</summary>
+        <ol>
+          <li>Tap Download Certificate above</li>
+          <li>Go to Settings → Security → Install from storage</li>
+          <li>Select the downloaded certificate</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>iPhone / iPad</summary>
+        <ol>
+          <li>Tap Download Certificate above</li>
+          <li>Go to Settings → Profile Downloaded → Install</li>
+          <li>Go to Settings → General → About → Certificate Trust Settings</li>
+          <li>Enable "Gohfert Home Lab CA"</li>
+        </ol>
+      </details>
+    </body>
+    </html>
+---
+# Since the HTML is mounted with subPath, changes to the ConfigMap do not
+# automatically propagate. You need to restart the pod with
+# `kubectl rollout restart deployment ca-download-deployment -n cert-manager`
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-download-deployment
+  namespace: cert-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ca-download
+  template:
+    metadata:
+      labels:
+        app: ca-download
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+            - name: ca-cert
+              mountPath: /usr/share/nginx/html/gohfert-ca.crt
+              subPath: tls.crt
+      volumes:
+        - name: html
+          configMap:
+            name: ca-download-page
+        - name: ca-cert
+          secret:
+            secretName: gohfert-ca-secret
