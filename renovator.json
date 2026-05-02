@@ -1,0 +1,55 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":semanticCommits",
+    ":dependencyDashboard"
+  ],
+  "onboarding": false,
+  "requireConfig": "optional",
+  "timezone": "UTC",
+  "minimumReleaseAge": "7 days",
+  "branchPrefix": "renovator/",
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "Only allow patch and minor version bumps",
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
+    },
+    {
+      "description": "Pin Docker image references in Dockerfiles and Kubernetes manifests to digests",
+      "matchManagers": ["dockerfile", "kubernetes"],
+      "matchDatasources": ["docker"],
+      "pinDigests": true
+    },
+    {
+      "description": "Ignore self-built docs image",
+      "matchPackageNames": ["ghcr.io/felix-seifert/gohfert-cluster-docs"],
+      "enabled": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update chart version in k3s HelmChart CRDs",
+      "managerFilePatterns": ["/^kubernetes/.+\\.ya?ml$/"],
+      "matchStrings": [
+        "repo:\\s+(?<registryUrl>\\S+)\\s+chart:\\s+(?<depName>\\S+)\\s+version:\\s+(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "helm"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Terraform CLI version pinned in GitHub Actions workflows",
+      "managerFilePatterns": ["/^\\.github/workflows/.+\\.ya?ml$/"],
+      "matchStrings": [
+        "terraform_version:\\s*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "hashicorp/terraform",
+      "extractVersionTemplate": "^v(?<version>.*)$"
+    }
+  ]
+}

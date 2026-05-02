@@ -1,0 +1,31 @@
+name: Renovate
+
+on:
+  schedule:
+    # Every Monday and Thursday at 7 AM UTC
+    - cron: '0 7 * * 1,4'
+  workflow_dispatch:
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get token
+        id: get_token
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # SHA for version 3.1.1
+        with:
+          private-key: ${{ secrets.GOHFERT_RENOVATOR_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.GOHFERT_RENOVATOR_APP_ID }}
+          owner: ${{ github.repository_owner }}
+          repositories: 'gohfert-cluster'
+
+      - name: Checkout
+        uses: actions/checkout@v08c6903cd8c0fde910a37f88322edcfb5dd907a8 # SHA for version 5.0.0
+
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@f66d8679fcfcfa051abde6e7a623007173bf5164 # SHA for version 46.1.12
+        with:
+          configurationFile: renovator.json
+          token: ${{ steps.get_token.outputs.token }}
+        env:
+          RENOVATE_PLATFORM_COMMIT: 'true'
