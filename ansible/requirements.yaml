@@ -22,7 +22,7 @@ collections:
 
   # Needed for timothystewart6/k3s-ansible
   - name: ansible.utils
-    version: 6.0.0
+    version: 6.0.2
   - name: community.general
     version: 11.2.1
   - name: ansible.posix
