@@ -28,4 +28,5 @@ jobs:
           configurationFile: renovator.json
           token: ${{ steps.get_token.outputs.token }}
         env:
-          RENOVATE_PLATFORM_COMMIT: 'true'
+          RENOVATE_PLATFORM_COMMIT: 'enabled'
+          RENOVATE_REPOSITORIES: 'felix-seifert/gohfert-cluster'
