@@ -31,12 +31,18 @@ TAGS ?= all
 VAULT ?= --vault-password-file vault-pass.txt
 ARGS ?=
 
+SSH_CONFIG_FILE := ssh_config
+GENERATE_SSH_CONFIG_SCRIPT := scripts/generate_ssh_config.py
+MACHINES_CSV := data/machines.csv
+SSH_USER_CONFIG := $(HOME)/.ssh/config
+SSH_INCLUDE_LINE := Include $(abspath $(SSH_CONFIG_FILE))
+
 K3S_ANSIBLE_COLLECTION := $(ANSIBLE_SUBDIR)/ansible_collections/techno_tim/k3s_ansible
 DEPLOY_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/site.yml
 RESET_K3S_CLUSTER_PLAYBOOK := $(K3S_ANSIBLE_COLLECTION)/reset.yml
 REBOOT_K3S_CLUSTER_PLAYBOOK := $(ANSIBLE_SUBDIR)/playbooks/k3s_node_reboot.yaml
 
-.PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes
+.PHONY: check-terraform lint run clean help deploy-k3s-cluster destroy-k3s-cluster reboot-k3s-cluster-nodes generate-ssh-config install-ssh-config
 
 .DEFAULT_GOAL := help
 
@@ -101,6 +107,25 @@ else
 		ARGS="--extra-vars 'concurrent_reboots=1 wait_seconds_after_reboot=30 ansible_user=$(USER)'"
 endif
 
+generate-ssh-config: $(SSH_CONFIG_FILE)
+
+$(SSH_CONFIG_FILE): $(GENERATE_SSH_CONFIG_SCRIPT) $(MACHINES_CSV)
+	@./$(GENERATE_SSH_CONFIG_SCRIPT) --input $(MACHINES_CSV) --output $(SSH_CONFIG_FILE)
+
+install-ssh-config: $(SSH_CONFIG_FILE)
+	@mkdir -p $(HOME)/.ssh && chmod 700 $(HOME)/.ssh
+	@touch $(SSH_USER_CONFIG) && chmod 600 $(SSH_USER_CONFIG)
+	@if grep -qxF '$(SSH_INCLUDE_LINE)' $(SSH_USER_CONFIG); then \
+		echo "Already present in $(SSH_USER_CONFIG): $(SSH_INCLUDE_LINE)"; \
+	else \
+		tmp=$$(mktemp) && \
+		printf '%s\n\n' '$(SSH_INCLUDE_LINE)' > $$tmp && \
+		cat $(SSH_USER_CONFIG) >> $$tmp && \
+		mv $$tmp $(SSH_USER_CONFIG) && \
+		chmod 600 $(SSH_USER_CONFIG) && \
+		echo "Prepended to $(SSH_USER_CONFIG): $(SSH_INCLUDE_LINE)"; \
+	fi
+
 plan: init
 	$(TF) -chdir=$(TF_SUBDIR) plan -out=$(TF_PLAN)
 
@@ -152,6 +177,10 @@ help:
 	@echo "                             deploying the K3s cluster"
 	@echo "  reboot-k3s-cluster-nodes   Reboot K3s nodes/machines in data/machines.csv one by one with waits"
 	@echo "                             Optionally pass a USER arg to execute as a different user"
+	@echo "  generate-ssh-config        Regenerate ssh_config from data/machines.csv. Include the file"
+	@echo "                             from your ~/.ssh/config to SSH into K3s nodes via the MAAS jump host"
+	@echo "  install-ssh-config         Idempotently prepend an Include directive for ssh_config to your"
+	@echo "                             ~/.ssh/config so the K3s host entries take effect"
 	@echo "  plan                       Check Terraform state objects' intention and store necessary changes"
 	@echo "                             in a plan file"
 	@echo "  apply                      Perform Terraform changes previously stored in a plan file"

@@ -1,0 +1,21 @@
+# Generated from machine data. Do not edit by hand.
+# Regenerate with: make generate-ssh-config
+
+Host gohfert-jump
+    HostName maas.cluster.gohfert.com
+    User felix-seifert
+
+Host dematu01
+    HostName dematu01
+    User felix-seifert
+    ProxyJump gohfert-jump
+
+Host dematu02
+    HostName dematu02
+    User felix-seifert
+    ProxyJump gohfert-jump
+
+Host dematu03
+    HostName dematu03
+    User felix-seifert
+    ProxyJump gohfert-jump
