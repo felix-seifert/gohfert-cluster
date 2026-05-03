@@ -2,7 +2,7 @@
 roles:
   # For setting up PostgreSQL database
   - name: geerlingguy.postgresql
-    version: "4.0.1"
+    version: "4.0.4"
 
   # For installing self-hosted GitHub Actions runner
   - name: monolithprojects.github_actions_runner
