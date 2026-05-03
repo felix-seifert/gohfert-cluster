@@ -1,3 +1,3 @@
 mkdocs-material==9.6.20
 plantuml-markdown==3.11.2
-pymarkdownlnt==0.9.32
+pymarkdownlnt==0.9.36
