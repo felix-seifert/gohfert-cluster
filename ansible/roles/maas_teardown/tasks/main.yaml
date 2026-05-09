@@ -1,26 +1,62 @@
 ---
-- name: Uninstall MaaS
+# A partially-removed MaaS leaves bind9 half-configured (stale includes in
+# /etc/bind/named.conf.options point at /etc/bind/maas/ files that no longer
+# parse). Reset that file first so the rest of this role can apt-purge cleanly.
+- name: Check bind9 package status
+  ansible.builtin.command: dpkg-query -W -f='${Status}' bind9
+  register: bind9_pkg_status
+  changed_when: false
+  failed_when: false
+
+- name: Reset /etc/bind/named.conf.options if bind9 is half-configured
+  when:
+    - bind9_pkg_status.stdout | length > 0
+    - "'install ok installed' not in bind9_pkg_status.stdout"
+  ansible.builtin.copy:
+    dest: /etc/bind/named.conf.options
+    content: |
+      options {
+          directory "/var/cache/bind";
+          dnssec-validation auto;
+          listen-on-v6 { any; };
+      };
+    owner: root
+    group: bind
+    mode: '0644'
+
+# Force-remove MaaS packages with dpkg directly: their postinst runs a Django
+# dbupgrade against Postgres and fails when the DB is unreachable, which
+# blocks every subsequent apt operation. --force-all skips that step entirely.
+- name: Force-purge MaaS packages
+  ansible.builtin.command: dpkg --purge --force-all {{ item }}
+  loop:
+    - maas
+    - maas-region-controller
+    - maas-rack-controller
+    - maas-region-api
+  register: maas_force_purges
+  changed_when: maas_force_purges.rc == 0
+  failed_when: false
+
+# bind9 is purged because MaaS heavily edits its config; a fresh bind9 will be
+# pulled back in as a MaaS dependency on the next install. autoremove cleans
+# up the rest of the MaaS dep tree (maas-common, maas-cli, etc.).
+- name: Purge bind9 and any remaining MaaS dependencies
   ansible.builtin.apt:
     name:
-      - maas
-      - maas-agent
-      - maas-cli
-      - maas-common
-      - maas-dhcp
-      - maas-nemon
-      - maas-proxy
-      - maas-rack
-      - python3-maas-client
-      - python3-maas-provisioningserver
+      - bind9
     state: absent
+    purge: true
+    autoremove: true
 
-- name: Remove MaaS Files
+- name: Remove MaaS state and residual bind9 config
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
-  with_items:
-    - "/var/lib/maas/"
-    - "/etc/maas/"
+  loop:
+    - /var/lib/maas
+    - /etc/maas
+    - /etc/bind
 
 - name: Uninstall Postgres
   ansible.builtin.apt:
