@@ -6,7 +6,7 @@ roles:
 
   # For installing self-hosted GitHub Actions runner
   - name: monolithprojects.github_actions_runner
-    version: 436f45b0e0d5b69df82cf5414c2786e63f0d4fc0 # 1.27.0
+    version: 5437d7e240c92fe0585c70a8a0a0981904d5a7ba # 1.28.0
     src: https://github.com/MonolithProjects/ansible-github_actions_runner
 
   # For installing kubectl
@@ -29,8 +29,8 @@ collections:
   - name: ansible.utils
     version: 6.0.2
   - name: community.general
-    version: 11.2.1
+    version: 12.6.0
   - name: ansible.posix
     version: 2.1.0
   - name: kubernetes.core
-    version: 6.1.0
+    version: 6.4.0
