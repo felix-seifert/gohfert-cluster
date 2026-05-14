@@ -1,4 +1,4 @@
-FROM caddy:2.11.3-alpine@sha256:bb56e6200ec26a67f04be90255993dc390c9815967f67f24b4ca6466e88de64b
+FROM caddy:2.11.3-alpine@sha256:86deaf5e3d3408a6ccec08fbb79989783dd26e206ae10bcf78a801dc8c9ab794
 WORKDIR /srv
 COPY site /srv
 COPY Caddyfile /etc/caddy/Caddyfile
