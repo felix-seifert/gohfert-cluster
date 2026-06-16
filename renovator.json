@@ -14,9 +14,15 @@
   "labels": ["dependencies"],
   "packageRules": [
     {
-      "description": "Only allow patch and minor version bumps",
+      "description": "Only allow patch version bumps by default (disable major and minor)",
       "matchUpdateTypes": ["major", "minor"],
       "enabled": false
+    },
+    {
+      "description": "Allow minor (and patch) bumps for GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor"],
+      "enabled": true
     },
     {
       "description": "Pin Docker image references in Dockerfiles and Kubernetes manifests to digests",
