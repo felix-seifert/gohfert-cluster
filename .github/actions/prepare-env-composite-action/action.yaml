@@ -33,21 +33,21 @@ runs:
 
     - name: Cache venv
       id: cache-venv
-      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         key: venv-${{ runner.os }}-${{ steps.set_up_python.outputs.python-version }}-${{ steps.env_info.outputs.python_hash }}
         path: ${{ steps.env_info.outputs.venv_dir }}
 
     - name: Cache Ansible collections
       id: cache-collections
-      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         key: collections-${{ runner.os }}-${{ steps.env_info.outputs.ansible_hash }}
         path: ${{ steps.env_info.outputs.collections_dir }}
 
     - name: Cache Ansible Galaxy roles
       id: cache-roles
-      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         key: roles-${{ runner.os }}-${{ steps.env_info.outputs.ansible_hash }}
         path: ${{ steps.env_info.outputs.galaxy_roles_dir }}
