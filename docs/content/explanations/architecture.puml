@@ -30,9 +30,9 @@ rectangle "VLAN 150" {
         component "K3s Master" as k3s3
     }
 
-'    node "Dell Wyse 5070" as dell4 {
-'        component "K3s Worker" as k3s4
-'    }
+    node "Dell Wyse 5070" as dell4 {
+        component "K3s Worker" as k3s4
+    }
 
     component "K3s Cluster" as cluster
 }
@@ -43,18 +43,18 @@ dev -[#blue]-> maas: "2. Call via\nTerraform"
 maas -[#blue]-> dell1: Deploy\n(via Terraform)
 maas -[#blue]-> dell2: Deploy\n(via Terraform)
 maas -[#blue]-> dell3: Deploy\n(via Terraform)
-'maas -[#red]-> dell4: Deploy\n(via Terraform)
+maas -[#blue]-> dell4: Deploy\n(via Terraform)
 
 dev -[#green]-> jump: "3. Jump\nwith Ansible"
 jump --[#green]--> k3s1: Deploy\n(via Ansible)
 jump --[#green]--> k3s2: Deploy\n(via Ansible)
 jump --[#green]--> k3s3: Deploy\n(via Ansible)
-'jump --[#green]--> k3s4
+jump --[#green]--> k3s4
 
 k3s1 --> cluster
 k3s2 --> cluster
 k3s3 --> cluster
-'k3s4 --> cluster
+k3s4 --> cluster
 
 hide invi
 hide invi2
