@@ -12,6 +12,8 @@
   "minimumReleaseAge": "7 days",
   "branchPrefix": "renovator/",
   "labels": ["dependencies"],
+  "automerge": true,
+  "platformAutomerge": true,
   "packageRules": [
     {
       "description": "Only allow patch version bumps by default (disable major and minor)",
