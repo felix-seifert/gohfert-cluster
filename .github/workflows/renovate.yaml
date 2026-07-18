@@ -30,4 +30,3 @@ jobs:
         env:
           RENOVATE_PLATFORM_COMMIT: 'enabled'
           RENOVATE_REPOSITORIES: 'felix-seifert/gohfert-cluster'
-          GITHUB_COM_TOKEN: ${{ secrets.RENOVATE_GITHUB_COM_TOKEN }}
