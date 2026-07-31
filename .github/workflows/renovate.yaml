@@ -20,7 +20,7 @@ jobs:
           repositories: 'gohfert-cluster'
 
       - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@3064367f740a1a91cca218698a63902689cce200 # v46.1.20
