@@ -64,6 +64,29 @@ jobs:
           client-id: ${{ secrets.GOHFERT_TAGGER_APP_ID }}
           private-key: ${{ secrets.GOHFERT_TAGGER_APP_PRIVATE_KEY }}
 
+      # TEMPORARY: diagnose the 403 from `POST /git/refs` in the step below. GitHub
+      # returns the permissions it expected in `x-accepted-github-permissions`, which
+      # create-pull-request does not surface. Remove once the cause is known.
+      - name: Probe ref-creation permissions
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ steps.token-generator.outputs.token }}
+          PROBE_BRANCH: probe-${{ github.run_id }}
+        run: |
+          echo "--- POST /git/refs (refs/heads/$PROBE_BRANCH -> $GITHUB_SHA) ---"
+          curl -sS -D - -o /dev/null -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/git/refs" \
+            -d "{\"ref\":\"refs/heads/$PROBE_BRANCH\",\"sha\":\"$GITHUB_SHA\"}" \
+            | grep -iE '^(HTTP/|x-accepted-github-permissions|x-github-request-id)' || true
+
+          echo "--- cleanup (no-op if the ref was never created) ---"
+          curl -sS -o /dev/null -w 'delete: %{http_code}\n' -X DELETE \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/git/refs/heads/$PROBE_BRANCH" || true
+
       - name: Create branch and PR with Kubernetes manifest changes
         id: pr
         if: steps.changes.outputs.has_changes == 'true'
